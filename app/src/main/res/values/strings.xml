@@ -1,8 +1,14 @@
 <resources>
     <string name="app_name">Memo</string>
+    <string name="website">cycoe.win</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="action_settings">Settings</string>
+
+    <string name="title">标题</string>
+    <string name="content">内容</string>
+
+
 </resources>

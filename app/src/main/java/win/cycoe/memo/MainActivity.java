@@ -38,8 +38,10 @@ public class MainActivity extends AppCompatActivity
     private SimpleAdapter simpleAdapter;
     private List<Map<String, Object>> dataList;
     private String[][] contentList;
+    private String[] contentTemp;
     private int[] idList;
     private Intent intent;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -259,11 +261,20 @@ public class MainActivity extends AppCompatActivity
         int position = (int) info.id;
         switch (item.getItemId()) {
             case 0:
+                contentTemp = contentList[position];
                 deleteItemInDatabase(idList[position]);
+                refreshListView();
+                Snackbar.make(listView, "是否撤销删除",Snackbar.LENGTH_LONG)
+                        .setAction("撤销", new View.OnClickListener(){
+                            @Override
+                            public void onClick(View v) {
+                                addItemInDatabase(contentTemp);
+                                refreshListView();
+                            }
+                        })
+                        .show();
                 break;
         }
-
-        refreshListView();
 
         return super.onContextItemSelected(item);
     }

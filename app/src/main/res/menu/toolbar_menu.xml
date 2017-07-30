@@ -6,6 +6,6 @@
         android:id="@+id/backButton"
         android:icon="@drawable/ic_menu_camera"
         android:title="返回"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="ifRoom|collapseActionView" />
 
 </menu>

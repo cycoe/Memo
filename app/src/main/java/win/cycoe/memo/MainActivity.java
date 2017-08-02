@@ -1,6 +1,8 @@
 package win.cycoe.memo;
 
+import android.content.ClipboardManager;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -173,7 +175,7 @@ public class MainActivity extends AppCompatActivity
     private void readDatabase() {
         SQLiteDatabase db = openOrCreateDatabase("memo.db", MODE_PRIVATE, null);
         Cursor cr = db.rawQuery("select * from memotb ORDER BY date desc", null);
-        idList = new int [cr.getCount()];
+        idList = new int[cr.getCount()];
         contentList = new String[cr.getCount()][4];
         if(cr != null) {
             for(int i = 0; cr.moveToNext(); i++) {
@@ -255,6 +257,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onCreateContextMenu(ContextMenu contextMenu, View view, ContextMenu.ContextMenuInfo contextMenuInfo) {
                 contextMenu.add(0, 0, 0, R.string.delete);
+                contextMenu.add(0, 1, 0, "复制到剪贴板");
             }
         });
     }
@@ -267,7 +270,7 @@ public class MainActivity extends AppCompatActivity
                 contentTemp = contentList[position];
                 deleteItemInDatabase(idList[position]);
                 refreshListView();
-                Snackbar.make(listView, "是否撤销删除",Snackbar.LENGTH_LONG)
+                Snackbar.make(listView, "是否撤销删除", Snackbar.LENGTH_LONG)
                         .setAction("撤销", new View.OnClickListener(){
                             @Override
                             public void onClick(View v) {
@@ -277,6 +280,10 @@ public class MainActivity extends AppCompatActivity
                         })
                         .show();
                 break;
+            case 1:
+                ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                clipboard.setText(contentList[position][1]);
+                Snackbar.make(listView, "已复制到剪贴板", Snackbar.LENGTH_SHORT).show();
         }
 
         return super.onContextItemSelected(item);

@@ -4,13 +4,18 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.Spannable;
+import android.text.SpannableString;
 import android.text.TextWatcher;
+import android.text.style.StyleSpan;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.Toolbar;
@@ -50,6 +55,7 @@ public class ContentActivity extends Activity implements View.OnClickListener {
 
     private String[] content = new String[3];
     private boolean isInput = true;
+    private boolean isisInput = true;
 
 
     @Override
@@ -111,10 +117,7 @@ public class ContentActivity extends Activity implements View.OnClickListener {
         redoButton.setOnClickListener(this);
 
         builder = new AlertDialog.Builder(this);
-        builder.setTitle("提示");
-
-        contentStack = new ContentStack(10);
-        contentStack.put(content[1], 0, content[1].length());
+        builder.setTitle(R.string.tip);
     }
 
     // create different clickListener for dialog
@@ -147,6 +150,8 @@ public class ContentActivity extends Activity implements View.OnClickListener {
     // get the Intent Object, get the content string array with key "content"
     private void initData() {
         content = (String[]) getIntent().getStringArrayExtra("content");
+        contentStack = new ContentStack(10);
+        contentStack.put(content[1], content[1].length());
     }
 
     // create dialog with message and 2 clickListener
@@ -175,7 +180,7 @@ public class ContentActivity extends Activity implements View.OnClickListener {
         contentLine.setText(content[1]);
         contentLine.requestFocus();
         contentLine.setSelection(content[1].length());
-        dateView.setText(R.string.lastModifiedTime + content[2]);
+        dateView.setText(content[2]);
 
         if(content[2].isEmpty())
             dateView.setVisibility(View.GONE);
@@ -216,9 +221,21 @@ public class ContentActivity extends Activity implements View.OnClickListener {
         });
     }
 
-    private boolean findInList(char item) {
-        for(int i = 0; i < STOPCHARLIST.length; i++)
-            if(item == STOPCHARLIST[i])
+    private void setTextBold() {
+        SpannableString spanText = new SpannableString(contentLine.getText());
+        int start = contentLine.getSelectionStart();
+        int end = contentLine.getSelectionEnd();
+        spanText.setSpan(new StyleSpan(Typeface.BOLD), start, end, Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
+        contentLine.setText(spanText);
+        contentLine.setSelection(end);
+    }
+
+    private boolean findInList(String content, int position) {
+        if(content.isEmpty())
+            return false;
+        char item = content.charAt(position);
+        for (char stopChar : STOPCHARLIST)
+            if (item == stopChar)
                 return true;
         return false;
     }
@@ -282,10 +299,14 @@ public class ContentActivity extends Activity implements View.OnClickListener {
     }
 
     private void undo() {
+        String content = contentLine.getText().toString();
+        int length = contentLine.getText().length();
+        if(isisInput && !findInList(content, length - 1))
+            contentStack.put(content, length);
         isInput = false;
         Map<String, Object> map = contentStack.undo();
         contentLine.setText((String) map.get("content"));
-        contentLine.setSelection((int) map.get("cursorStart") + (int) map.get("cursorCount"));
+        contentLine.setSelection((int) map.get("cursor"));
         if(contentStack.canUndo())
             setButtonEnabled(undoButton, true);
         else
@@ -297,7 +318,7 @@ public class ContentActivity extends Activity implements View.OnClickListener {
         isInput = false;
         Map<String, Object> map = contentStack.redo();
         contentLine.setText((String) map.get("content"));
-        contentLine.setSelection((int) map.get("cursorStart") + (int) map.get("cursorCount"));
+        contentLine.setSelection((int) map.get("cursor"));
         if(contentStack.canRedo())
             setButtonEnabled(redoButton, true);
         else
@@ -315,7 +336,7 @@ public class ContentActivity extends Activity implements View.OnClickListener {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                if(titleLine.getText().toString().trim().isEmpty() && contentLine.getText().toString().trim().isEmpty())
+                if(charSequence.toString().trim().isEmpty() && contentLine.getText().toString().trim().isEmpty())
                     setButtonEnabled(saveButton, false);
                 else
                     setButtonEnabled(saveButton, true);
@@ -334,19 +355,22 @@ public class ContentActivity extends Activity implements View.OnClickListener {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
-                if(titleLine.getText().toString().trim().isEmpty() && contentLine.getText().toString().trim().isEmpty())
+                if(titleLine.getText().toString().trim().isEmpty() && charSequence.toString().trim().isEmpty())
                     setButtonEnabled(saveButton, false);
                 else
                     setButtonEnabled(saveButton, true);
-                if(isInput && findInList(charSequence.toString().charAt(start + count - 1))) {
-                    contentStack.put(contentLine.getText().toString(), start, count);
+                if(isInput) {
                     setButtonEnabled(undoButton, true);
                     setButtonEnabled(redoButton, false);
+                }
+                if(isInput && findInList(charSequence.toString(), start + count - 1)) {
+                    contentStack.put(charSequence.toString(), start + count);
                 }
             }
 
             @Override
             public void afterTextChanged(Editable editable) {
+                isisInput = isInput;
                 isInput = true;
             }
         });

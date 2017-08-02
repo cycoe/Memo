@@ -14,8 +14,7 @@ public class ContentStack {
     private int currentPoint;
     private int stackDepth;
     private String[] contentList;
-    private int[] cursorStartList;
-    private int[] cursorCountList;
+    private int[] cursorList;
     private Map<String, Object> map;
 
     public ContentStack(int _maxNum) {
@@ -23,27 +22,23 @@ public class ContentStack {
         currentPoint = 0;
         stackDepth = 0;
         contentList = new String[maxNum];
-        cursorStartList = new int[maxNum];
-        cursorCountList = new int[maxNum];
+        cursorList = new int[maxNum];
         map = new HashMap<String, Object>();
     }
 
-    public void put(String content, int cursorStart, int cursorCount) {
+    public void put(String content, int cursor) {
         for(int i = 0; i < stackDepth - currentPoint; i++) {
             contentList[i] = contentList[i + currentPoint];
-            cursorStartList[i] = cursorStartList[i + currentPoint];
-            cursorCountList[i] = cursorCountList[i + currentPoint];
+            cursorList[i] = cursorList[i + currentPoint];
         }
         stackDepth = stackDepth - currentPoint;
         currentPoint = 0;
         for(int i = maxNum - 1; i > 0; i--) {
             contentList[i] = contentList[i - 1];
-            cursorStartList[i] = cursorStartList[i - 1];
-            cursorCountList[i] = cursorCountList[i - 1];
+            cursorList[i] = cursorList[i - 1];
         }
         contentList[0] = content;
-        cursorStartList[0] = cursorStart;
-        cursorCountList[0] = cursorCount;
+        cursorList[0] = cursor;
         if(stackDepth < maxNum)
             stackDepth++;
     }
@@ -70,7 +65,6 @@ public class ContentStack {
 
     private void packMap() {
         map.put("content", contentList[currentPoint]);
-        map.put("cursorStart", cursorStartList[currentPoint]);
-        map.put("cursorCount", cursorCountList[currentPoint]);
+        map.put("cursor", cursorList[currentPoint]);
     }
 }

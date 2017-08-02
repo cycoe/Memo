@@ -45,6 +45,12 @@
             android:background="?android:attr/selectableItemBackgroundBorderless"
             android:src="@mipmap/del" />
 
+        <!--<SeekBar-->
+            <!--android:id="@+id/sizeChanger"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_marginLeft="20dp" />-->
+
     </LinearLayout>
 
 </ScrollView>

@@ -30,7 +30,7 @@ public class ContentActivity extends Activity implements View.OnClickListener {
     private final int UNMODIFIED = 0;
     private final int MODIFIED = 1;
     private final int DELETE = 2;
-    private final String[] STOPCHARLIST = {" ", "\n", ",", ".", "，", "。", "!", "?", "！", "？"};
+    private final char[] STOPCHARLIST = {' ', '\n', ',', '.', '，', '。', '!', '?', '！', '？'};
 
     private Toolbar itemToolbar;
     private ImageButton undoButton;
@@ -216,6 +216,13 @@ public class ContentActivity extends Activity implements View.OnClickListener {
         });
     }
 
+    private boolean findInList(char item) {
+        for(int i = 0; i < STOPCHARLIST.length; i++)
+            if(item == STOPCHARLIST[i])
+                return true;
+        return false;
+    }
+
     private void setButtonEnabled(View view, boolean flag) {
         if(flag) {
             view.setEnabled(flag);
@@ -331,7 +338,7 @@ public class ContentActivity extends Activity implements View.OnClickListener {
                     setButtonEnabled(saveButton, false);
                 else
                     setButtonEnabled(saveButton, true);
-                if(isInput) {
+                if(isInput && findInList(charSequence.toString().charAt(start + count - 1))) {
                     contentStack.put(contentLine.getText().toString(), start, count);
                     setButtonEnabled(undoButton, true);
                     setButtonEnabled(redoButton, false);

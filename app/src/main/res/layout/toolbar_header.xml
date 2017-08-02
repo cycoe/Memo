@@ -16,21 +16,19 @@
         android:gravity="center_vertical|right"
         android:orientation="horizontal" >
 
-        <ImageButton
-            android:id="@+id/saveButton"
-            android:layout_width="wrap_content"
+        <EditText
+            android:id="@+id/titleLine"
             android:layout_height="wrap_content"
-            android:layout_marginRight="20dp"
-            android:background="?android:attr/selectableItemBackgroundBorderless"
-            android:src="@mipmap/save" />
+            android:layout_width="match_parent"
+            android:background="@null"
 
-        <ImageButton
-            android:id="@+id/delButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="20dp"
-            android:background="?android:attr/selectableItemBackgroundBorderless"
-            android:src="@mipmap/del" />
+            android:gravity="left|center_vertical"
+            android:textSize="20dp"
+            android:textColor="@color/white"
+            android:inputType="text"
+            android:maxLength="40"
+            android:hint="@string/title"
+            />
 
     </LinearLayout>
 

@@ -1,54 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+<FrameLayout
+    android:layout_height="match_parent"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <include layout="@layout/toolbar_main"/>
-
-    <ScrollView
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_margin="5dp" >
+        android:layout_marginBottom="50dp">
 
-        <LinearLayout
-            android:orientation="vertical"
+        <include layout="@layout/toolbar_header"/>
+
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="match_parent" >
+            android:layout_height="match_parent"
+            android:fillViewport="true"
+            android:layout_margin="5dp" >
 
-            <EditText
-                android:id="@+id/titleLine"
-                android:layout_height="wrap_content"
+            <LinearLayout
+                android:orientation="vertical"
                 android:layout_width="match_parent"
+                android:layout_height="match_parent" >
 
-                android:gravity="left"
-                android:textSize="20dp"
-                android:inputType="text"
-                android:maxLength="40"
-                android:hint="@string/title"
-                />
 
-            <EditText
-                android:id="@+id/contentLine"
-                android:layout_height="match_parent"
-                android:layout_width="match_parent"
-                android:gravity="left"
-                android:textSize="15dp"
-                android:inputType="textMultiLine"
-                android:hint="@string/content"
-                />
+                <EditText
+                    android:id="@+id/contentLine"
+                    android:layout_height="match_parent"
+                    android:layout_width="match_parent"
+                    android:gravity="left"
+                    android:textSize="15dp"
+                    android:inputType="textMultiLine"
+                    android:hint="@string/content" />
 
-            <TextView
-                android:id="@+id/dateView"
-                android:layout_height="wrap_content"
-                android:layout_width="match_parent"
-                android:gravity="right"
-                android:textSize="10dp"
-                />
+                <TextView
+                    android:id="@+id/dateView"
+                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    android:gravity="right"
+                    android:textSize="10dp" />
 
-        </LinearLayout>
+            </LinearLayout>
 
-    </ScrollView>
+        </ScrollView>
 
-</LinearLayout>
+    </LinearLayout>
+
+    <include layout="@layout/toolbar_bottom"/>
+
+</FrameLayout>

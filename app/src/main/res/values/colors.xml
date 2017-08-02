@@ -5,4 +5,5 @@
     <color name="colorAccent">#FF4081</color>
     <color name="colorHearder">#FFF44236</color>
     <color name="colorHearderDark">#F0E53833</color>
+    <color name="white">#FFFFFF</color>
 </resources>

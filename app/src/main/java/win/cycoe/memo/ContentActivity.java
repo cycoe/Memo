@@ -12,29 +12,36 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.Toolbar;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Map;
 
 
 /**
  * Created by cycoe on 7/27/17.
  */
 
-public class ContentActivity extends Activity {
+public class ContentActivity extends Activity implements View.OnClickListener {
 
-    // set the constants of resultcodes
+    // set the constants of resultCodes
     private final int UNMODIFIED = 0;
     private final int MODIFIED = 1;
     private final int DELETE = 2;
+    private final String[] STOPCHARLIST = {" ", "\n", ",", ".", "，", "。", "!", "?", "！", "？"};
 
     private Toolbar itemToolbar;
+    private ImageButton undoButton;
+    private ImageButton redoButton;
     private ImageButton saveButton;
     private ImageButton delButton;
     private TextView dateView;
     private EditText titleLine;
     private EditText contentLine;
+    private AlertDialog.Builder builder;
+    private ContentStack contentStack;
 
     private DialogInterface.OnClickListener clickListenerSave;
     private DialogInterface.OnClickListener clickListenerDel;
@@ -42,6 +49,7 @@ public class ContentActivity extends Activity {
     private DialogInterface.OnClickListener clickListenerNothing;
 
     private String[] content = new String[3];
+    private boolean isInput = true;
 
 
     @Override
@@ -49,12 +57,68 @@ public class ContentActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_item);
 
-        itemToolbar = (Toolbar) findViewById(R.id.itemToolbar);
+        initData();
+        initView();
+        initDialogListener();
+        fillView();
+        setToolbar();
+        setTextChangeListener();
+    }
 
+    //override the default back event
+    @Override
+    public void onBackPressed() {
+        setBackWithConfirm();
+    }
+
+    // override the default onClick methods
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.saveButton:
+                setBack(true, MODIFIED);
+                break;
+            case R.id.delButton:
+                deleteWithConfirm();
+                break;
+            case R.id.undoButton:
+                undo();
+                break;
+            case R.id.redoButton:
+                redo();
+                break;
+        }
+    }
+
+    // initiate view by id
+    // set on click listeners
+    private void initView() {
+        itemToolbar = (Toolbar) findViewById(R.id.itemToolbar);
         dateView = (TextView) findViewById(R.id.dateView);
         titleLine = (EditText) findViewById(R.id.titleLine);
         contentLine = (EditText) findViewById(R.id.contentLine);
+        undoButton = (ImageButton) findViewById(R.id.undoButton);
+        redoButton = (ImageButton) findViewById(R.id.redoButton);
+        saveButton = (ImageButton) findViewById(R.id.saveButton);
+        delButton = (ImageButton) findViewById(R.id.delButton);
 
+        setButtonEnabled(saveButton, false);
+        setButtonEnabled(undoButton, false);
+        setButtonEnabled(redoButton, false);
+        saveButton.setOnClickListener(this);
+        delButton.setOnClickListener(this);
+        undoButton.setOnClickListener(this);
+        redoButton.setOnClickListener(this);
+
+        builder = new AlertDialog.Builder(this);
+        builder.setTitle("提示");
+
+        contentStack = new ContentStack(10);
+        contentStack.put(content[1], 0, content[1].length());
+    }
+
+    // create different clickListener for dialog
+    private void initDialogListener() {
         clickListenerSave = new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
@@ -78,64 +142,69 @@ public class ContentActivity extends Activity {
             public void onClick(DialogInterface dialogInterface, int i) {
             }
         };
-
-        getContent();
-        fillView();
-        setToolbar();
-        setButtonVisibility();
     }
 
-    @Override
-    public void onBackPressed() {
-        setBackWithConfirm();
+    // get the Intent Object, get the content string array with key "content"
+    private void initData() {
+        content = (String[]) getIntent().getStringArrayExtra("content");
     }
 
+    // create dialog with message and 2 clickListener
+    private void createDialog(String message,
+                              DialogInterface.OnClickListener positiveListener,
+                              DialogInterface.OnClickListener negativeListener) {
+        /*
+         * 1. setMessage: set the massage to show
+         * 2. setPositiveButton(buttonString, clickListener)
+         * 3. setNegativeButton(buttonString, clickListener)
+         * 4. show(): remember to show dialog
+         */
+        builder.setMessage(message);
+        builder.setPositiveButton(R.string.yes,positiveListener);
+        builder.setNegativeButton(R.string.no, negativeListener);
+        builder.show();
 
-    private void getContent() {
-        content = (String[]) super.getIntent().getStringArrayExtra("content");
     }
 
     private void fillView() {
+        /*
+         * 1. initiate titleLine, contentLine, dateView with content
+         * 2. set the dateView unvisible if with no date string
+         */
         titleLine.setText(content[0]);
-        titleLine.setSelection(content[0].length());
         contentLine.setText(content[1]);
+        contentLine.requestFocus();
+        contentLine.setSelection(content[1].length());
+        dateView.setText(R.string.lastModifiedTime + content[2]);
+
         if(content[2].isEmpty())
-            dateView.setText("");
+            dateView.setVisibility(View.GONE);
         else
-            dateView.setText("最后修改时间：" + content[2]);
+            dateView.setVisibility(View.VISIBLE);
     }
 
     private String getNowTime() {
+        /*
+         * 1. instantiate a dateFormat object with the pattern of "yyyy-MM-dd HH:mm:ss"
+         * 2. return the formated date string
+         */
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         return dateFormat.format(new Date());
     }
 
     private void setToolbar() {
+        /*
+         * 1. inflateMenu(res/menu/menu.xml): set the flate menu items
+         * 2. setNavigationOnClickListener()
+         */
+
         itemToolbar.inflateMenu(R.menu.toolbar_menu);
         itemToolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View view) {
                 setBackWithConfirm();
             }
         });
-
-        saveButton = (ImageButton) findViewById(R.id.saveButton);
-        saveButton.setVisibility(View.GONE);
-        saveButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                setBack(true, MODIFIED);
-            }
-        });
-
-        delButton = (ImageButton) findViewById(R.id.delButton);
-        delButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                deleteWithConfirm();
-            }
-        });
-
         itemToolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
 
             @Override
@@ -147,44 +216,91 @@ public class ContentActivity extends Activity {
         });
     }
 
+    private void setButtonEnabled(View view, boolean flag) {
+        if(flag) {
+            view.setEnabled(flag);
+            view.setAlpha((float) 1);
+        }
+        else {
+            view.setEnabled(flag);
+            view.setAlpha((float) 0.5);
+        }
+    }
+
     private void deleteWithConfirm() {
-        new AlertDialog.Builder(this).setTitle("提示").setMessage("是否删除此便签")
-                .setPositiveButton("确定", clickListenerDel)
-                .setNegativeButton("取消", clickListenerNothing).show();
+        createDialog("是否删除此便签", clickListenerDel, clickListenerNothing);
     }
 
     private void setBackWithConfirm() {
-        if(saveButton.getVisibility() == View.VISIBLE) {
-            new AlertDialog.Builder(this).setTitle("提示").setMessage("是否保存")
-                    .setPositiveButton("确定", clickListenerSave)
-                    .setNegativeButton("取消", clickListenerDiscard).show();
+        /*
+         * 1. if saveButton is visible, means you need to save before back
+         * 2. else if the title and content are both empty, besides, the date is not empty, means
+         *    that you delete the content
+         * 3. others, go back with no modification
+         */
+        if(saveButton.isEnabled()) {
+            createDialog("是否保存", clickListenerSave, clickListenerDiscard);
         }
-        else if(titleLine.getText().toString().trim().isEmpty() && contentLine.getText().toString().trim().isEmpty()) {
-            new AlertDialog.Builder(this).setTitle("提示").setMessage("是否删除此空白便签")
-                    .setPositiveButton("确定", clickListenerDel)
-                    .setNegativeButton("取消", clickListenerDiscard).show();
+        else if(titleLine.getText().toString().trim().isEmpty()
+                && contentLine.getText().toString().trim().isEmpty()
+                && !content[2].isEmpty()) {
+            createDialog("是否删除此空白便签", clickListenerDel, clickListenerDiscard);
         }
         else
             setBack(false, UNMODIFIED);
     }
 
+    // the exit for upper activity
     private void setBack(boolean modified, int actionFlag) {
+        /*
+         * 1. initiate a new Intent
+         * 2. if content is modified, then replace the content array with new data
+         * 3. put the content array into Intent
+         * 4. setResult with resultCode and Intent
+         */
         Intent data = new Intent();
         if(modified) {
-            content[0] = titleLine.getText().toString();
-            content[1] = contentLine.getText().toString();
-            content[2] = getNowTime();
+            saveContent();
         }
         data.putExtra("content", content);
         setResult(actionFlag, data);
 
-        //结束当前页面
         finish();
     }
 
-    private void setButtonVisibility() {
+    private void saveContent() {
+        content[0] = titleLine.getText().toString();
+        content[1] = contentLine.getText().toString();
+        content[2] = getNowTime();
+    }
 
-        TextWatcher textWatcher = new TextWatcher() {
+    private void undo() {
+        isInput = false;
+        Map<String, Object> map = contentStack.undo();
+        contentLine.setText((String) map.get("content"));
+        contentLine.setSelection((int) map.get("cursorStart") + (int) map.get("cursorCount"));
+        if(contentStack.canUndo())
+            setButtonEnabled(undoButton, true);
+        else
+            setButtonEnabled(undoButton, false);
+        setButtonEnabled(redoButton, true);
+    }
+
+    private void redo() {
+        isInput = false;
+        Map<String, Object> map = contentStack.redo();
+        contentLine.setText((String) map.get("content"));
+        contentLine.setSelection((int) map.get("cursorStart") + (int) map.get("cursorCount"));
+        if(contentStack.canRedo())
+            setButtonEnabled(redoButton, true);
+        else
+            setButtonEnabled(redoButton, false);
+        setButtonEnabled(undoButton, true);
+    }
+
+    // set the visibility of the saveButton
+    private void setTextChangeListener() {
+        titleLine.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
@@ -193,18 +309,39 @@ public class ContentActivity extends Activity {
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 if(titleLine.getText().toString().trim().isEmpty() && contentLine.getText().toString().trim().isEmpty())
-                    saveButton.setVisibility(View.GONE);
+                    setButtonEnabled(saveButton, false);
                 else
-                    saveButton.setVisibility(View.VISIBLE);
+                    setButtonEnabled(saveButton, true);
             }
 
             @Override
             public void afterTextChanged(Editable editable) {
+            }
+        });
+
+        contentLine.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
             }
-        };
 
-        titleLine.addTextChangedListener(textWatcher);
-        contentLine.addTextChangedListener(textWatcher);
+            @Override
+            public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
+                if(titleLine.getText().toString().trim().isEmpty() && contentLine.getText().toString().trim().isEmpty())
+                    setButtonEnabled(saveButton, false);
+                else
+                    setButtonEnabled(saveButton, true);
+                if(isInput) {
+                    contentStack.put(contentLine.getText().toString(), start, count);
+                    setButtonEnabled(undoButton, true);
+                    setButtonEnabled(redoButton, false);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                isInput = true;
+            }
+        });
     }
 }

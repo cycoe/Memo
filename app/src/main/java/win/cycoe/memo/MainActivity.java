@@ -142,6 +142,7 @@ public class MainActivity extends AppCompatActivity
         for(int i = 0; i < HEADERLIST.length; i++)
             contentValues.put(HEADERLIST[i], content[i]);
         db.insert("memotb", null, contentValues);
+        db.close();
     }
 
     private void modifyItemInDatabase(int selectedItem, String[] content) {
@@ -152,6 +153,7 @@ public class MainActivity extends AppCompatActivity
         String whereClause = "_id=?";
         String[] whereArgs = new String[] {String.valueOf(selectedItem)};
         db.update("memotb", contentValues, whereClause, whereArgs);
+        db.close();
     }
 
     private void deleteItemInDatabase(int selectedItem) {
@@ -159,6 +161,7 @@ public class MainActivity extends AppCompatActivity
         String whereClause = "_id=?";
         String[] whereArgs = new String[] {String.valueOf(selectedItem)};
         db.delete("memotb", whereClause, whereArgs);
+        db.close();
     }
 
     private void createDatabase() {
@@ -251,7 +254,7 @@ public class MainActivity extends AppCompatActivity
         listView.setOnCreateContextMenuListener(new View.OnCreateContextMenuListener() {
             @Override
             public void onCreateContextMenu(ContextMenu contextMenu, View view, ContextMenu.ContextMenuInfo contextMenuInfo) {
-                contextMenu.add(0, 0, 0, "删除");
+                contextMenu.add(0, 0, 0, R.string.delete);
             }
         });
     }

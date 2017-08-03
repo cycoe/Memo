@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="50dp">
+
+        <include layout="@layout/toolbar_header"/>
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true"
+            android:layout_margin="5dp" >
+
+            <EditText
+                android:id="@+id/contentLine"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:gravity="start"
+                android:textSize="15dp"
+                android:inputType="textMultiLine"
+                android:hint="@string/content" />
+
+        </ScrollView>
+
+    </LinearLayout>
+
+    <include layout="@layout/toolbar_bottom"/>
+
+</FrameLayout>

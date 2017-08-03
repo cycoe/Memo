@@ -51,7 +51,7 @@ public class SpannedEditText extends EditText {
         setText(spannedText);
     }
 
-    public int[][] getSpanPosition() {
-        spannedText.getSpanStart()
+    public void getSpanPosition() {
+        spannedText.getSpanStart(boldSpan);
     }
 }

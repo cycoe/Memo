@@ -1,0 +1,7 @@
+#Wed Aug 02 21:37:27 CST 2017
+base.0=/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/transforms/dex/debug/folders/1000/10000/instant-run_cd66a5f4f09d87cb78699c1334d5ede64d6afd44
+renamed.1=classes2.dex
+renamed.0=classes.dex
+file.1=/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/transforms/dex/debug/folders/1000/10000/instant-run-bootstrap_77a02c960c843071374eadd5b624c44a296f0c9b/classes.dex
+base.1=/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/transforms/dex/debug/folders/1000/10000/instant-run-bootstrap_77a02c960c843071374eadd5b624c44a296f0c9b
+file.0=/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/transforms/dex/debug/folders/1000/10000/instant-run_cd66a5f4f09d87cb78699c1334d5ede64d6afd44/classes.dex

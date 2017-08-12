@@ -8,6 +8,14 @@
         "source": "/home/cycoe/AndroidStudioProjects/Memo/app/src/main/res/mipmap-hdpi/share.png"
     },
     {
+        "merged": "/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/res/merged/release/mipmap-hdpi/ul.png",
+        "source": "/home/cycoe/AndroidStudioProjects/Memo/app/src/main/res/mipmap-hdpi/ul.png"
+    },
+    {
+        "merged": "/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/res/merged/release/mipmap-hdpi/italic.png",
+        "source": "/home/cycoe/AndroidStudioProjects/Memo/app/src/main/res/mipmap-hdpi/italic.png"
+    },
+    {
         "merged": "/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/res/merged/release/mipmap-hdpi/ic_launcher.png",
         "source": "/home/cycoe/AndroidStudioProjects/Memo/app/src/main/res/mipmap-hdpi/ic_launcher.png"
     },
@@ -24,6 +32,10 @@
         "source": "/home/cycoe/AndroidStudioProjects/Memo/app/src/main/res/mipmap-hdpi/back.png"
     },
     {
+        "merged": "/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/res/merged/release/mipmap-hdpi/markdown.png",
+        "source": "/home/cycoe/AndroidStudioProjects/Memo/app/src/main/res/mipmap-hdpi/markdown.png"
+    },
+    {
         "merged": "/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/res/merged/release/mipmap-hdpi/undo.png",
         "source": "/home/cycoe/AndroidStudioProjects/Memo/app/src/main/res/mipmap-hdpi/undo.png"
     },
@@ -34,6 +46,10 @@
     {
         "merged": "/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/res/merged/release/mipmap-hdpi/bold.png",
         "source": "/home/cycoe/AndroidStudioProjects/Memo/app/src/main/res/mipmap-hdpi/bold.png"
+    },
+    {
+        "merged": "/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/res/merged/release/mipmap-hdpi/ol.png",
+        "source": "/home/cycoe/AndroidStudioProjects/Memo/app/src/main/res/mipmap-hdpi/ol.png"
     },
     {
         "merged": "/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/res/merged/release/mipmap-hdpi/add.png",

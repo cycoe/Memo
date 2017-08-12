@@ -4,12 +4,20 @@
         "source": "/home/cycoe/AndroidStudioProjects/Memo/app/src/main/res/mipmap-xxhdpi/share.png"
     },
     {
+        "merged": "/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/res/merged/release/mipmap-xxhdpi/markdown.png",
+        "source": "/home/cycoe/AndroidStudioProjects/Memo/app/src/main/res/mipmap-xxhdpi/markdown.png"
+    },
+    {
         "merged": "/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/res/merged/release/mipmap-xxhdpi/ic_launcher.png",
         "source": "/home/cycoe/AndroidStudioProjects/Memo/app/src/main/res/mipmap-xxhdpi/ic_launcher.png"
     },
     {
         "merged": "/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/res/merged/release/mipmap-xxhdpi/add.png",
         "source": "/home/cycoe/AndroidStudioProjects/Memo/app/src/main/res/mipmap-xxhdpi/add.png"
+    },
+    {
+        "merged": "/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/res/merged/release/mipmap-xxhdpi/ol.png",
+        "source": "/home/cycoe/AndroidStudioProjects/Memo/app/src/main/res/mipmap-xxhdpi/ol.png"
     },
     {
         "merged": "/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/res/merged/release/mipmap-xxhdpi/ic_launcher_round.png",
@@ -26,6 +34,14 @@
     {
         "merged": "/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/res/merged/release/mipmap-xxhdpi/back.png",
         "source": "/home/cycoe/AndroidStudioProjects/Memo/app/src/main/res/mipmap-xxhdpi/back.png"
+    },
+    {
+        "merged": "/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/res/merged/release/mipmap-xxhdpi/italic.png",
+        "source": "/home/cycoe/AndroidStudioProjects/Memo/app/src/main/res/mipmap-xxhdpi/italic.png"
+    },
+    {
+        "merged": "/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/res/merged/release/mipmap-xxhdpi/ul.png",
+        "source": "/home/cycoe/AndroidStudioProjects/Memo/app/src/main/res/mipmap-xxhdpi/ul.png"
     },
     {
         "merged": "/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/res/merged/release/mipmap-xxhdpi/undo.png",

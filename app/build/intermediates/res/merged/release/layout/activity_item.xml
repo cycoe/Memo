@@ -8,37 +8,66 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="50dp">
+        android:layout_marginBottom="50dp" >
 
         <include layout="@layout/toolbar_header"/>
 
-        <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" >
-
-            <TextView
-                android:id="@+id/markdownView"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
-
-        </ScrollView>
-
-        <ScrollView
+        <LinearLayout
+            android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:fillViewport="true"
-            android:layout_margin="5dp" >
+            android:divider="@drawable/separator"
+            android:showDividers="middle" >
 
-            <EditText
-                android:id="@+id/contentLine"
-                android:layout_height="wrap_content"
+            <FrameLayout
+                android:id="@+id/mdLayoutView"
                 android:layout_width="match_parent"
-                android:gravity="start"
-                android:textSize="15sp"
-                android:inputType="textMultiLine"
-                android:hint="@string/content" />
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:visibility="gone" >
 
-        </ScrollView>
+                <ScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:fillViewport="true"
+                    android:layout_margin="5dp" >
+
+                    <TextView
+                        android:id="@+id/markdownView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+
+                </ScrollView>
+
+                <ProgressBar
+                    android:id="@+id/loadProgressBar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:visibility="gone" />
+
+            </FrameLayout>
+
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fillViewport="true"
+                android:layout_margin="5dp"
+                android:layout_weight="1" >
+
+                <EditText
+                    android:id="@+id/contentLine"
+                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    android:gravity="start"
+                    android:textSize="15sp"
+                    android:inputType="textMultiLine"
+                    android:background="@null"
+                    android:hint="@string/content" />
+
+            </ScrollView>
+
+        </LinearLayout>
 
     </LinearLayout>
 

@@ -48,6 +48,14 @@
         "source": "/home/cycoe/AndroidStudioProjects/Memo/app/src/main/res/mipmap-xxhdpi/del.png"
     },
     {
+        "merged": "/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/res/merged/debug/mipmap-xxhdpi/deleteline.png",
+        "source": "/home/cycoe/AndroidStudioProjects/Memo/app/src/main/res/mipmap-xxhdpi/deleteline.png"
+    },
+    {
+        "merged": "/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/res/merged/debug/mipmap-xxhdpi/underline.png",
+        "source": "/home/cycoe/AndroidStudioProjects/Memo/app/src/main/res/mipmap-xxhdpi/underline.png"
+    },
+    {
         "merged": "/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/res/merged/debug/mipmap-xxhdpi/ic_launcher.png",
         "source": "/home/cycoe/AndroidStudioProjects/Memo/app/src/main/res/mipmap-xxhdpi/ic_launcher.png"
     },

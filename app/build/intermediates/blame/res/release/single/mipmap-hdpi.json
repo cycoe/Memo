@@ -32,8 +32,16 @@
         "source": "/home/cycoe/AndroidStudioProjects/Memo/app/src/main/res/mipmap-hdpi/back.png"
     },
     {
+        "merged": "/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/res/merged/release/mipmap-hdpi/underline.png",
+        "source": "/home/cycoe/AndroidStudioProjects/Memo/app/src/main/res/mipmap-hdpi/underline.png"
+    },
+    {
         "merged": "/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/res/merged/release/mipmap-hdpi/markdown.png",
         "source": "/home/cycoe/AndroidStudioProjects/Memo/app/src/main/res/mipmap-hdpi/markdown.png"
+    },
+    {
+        "merged": "/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/res/merged/release/mipmap-hdpi/deleteline.png",
+        "source": "/home/cycoe/AndroidStudioProjects/Memo/app/src/main/res/mipmap-hdpi/deleteline.png"
     },
     {
         "merged": "/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/res/merged/release/mipmap-hdpi/undo.png",

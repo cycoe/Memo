@@ -36,6 +36,7 @@ public class ContentActivity extends Activity implements View.OnClickListener, V
             {"*", "*"},
             {"- ", ""},
             {"1. ", ""},
+            {"~~", "~~"},
     };
 
     private Toolbar itemToolbar;
@@ -47,6 +48,7 @@ public class ContentActivity extends Activity implements View.OnClickListener, V
     private ImageButton italicButton;
     private ImageButton ulButton;
     private ImageButton olButton;
+    private ImageButton deletelineButton;
     private Switch mdSwitch;
     private TextView dateView;
     private EditText titleLine;
@@ -117,6 +119,9 @@ public class ContentActivity extends Activity implements View.OnClickListener, V
             case R.id.olButton:
                 insertSpan(3);
                 break;
+            case R.id.deletelineButton:
+                insertSpan(4);
+                break;
             case R.id.mdSwitch:
                 switchMdView();
                 break;
@@ -140,6 +145,7 @@ public class ContentActivity extends Activity implements View.OnClickListener, V
         italicButton = (ImageButton) findViewById(R.id.italicButton);
         ulButton = (ImageButton) findViewById(R.id.ulButton);
         olButton = (ImageButton) findViewById(R.id.olButton);
+        deletelineButton = (ImageButton) findViewById(R.id.deletelineButton);
         mdSwitch = (Switch) findViewById(R.id.mdSwitch);
         loadProgressBar = (ProgressBar) findViewById(R.id.loadProgressBar);
 
@@ -155,6 +161,7 @@ public class ContentActivity extends Activity implements View.OnClickListener, V
         italicButton.setOnClickListener(this);
         ulButton.setOnClickListener(this);
         olButton.setOnClickListener(this);
+        deletelineButton.setOnClickListener(this);
         mdSwitch.setOnClickListener(this);
 
         builder = new AlertDialog.Builder(this);

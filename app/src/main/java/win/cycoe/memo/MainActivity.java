@@ -11,19 +11,13 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.view.ContextMenu;
 import android.view.View;
-import android.support.design.widget.NavigationView;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,17 +26,19 @@ import java.util.Map;
 
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, AdapterView.OnItemClickListener {
+        implements AdapterView.OnItemClickListener {
 
     private final String[] HEADERLIST = {"title", "content", "date"};
 
     private ListView listView;
     private SimpleAdapter simpleAdapter;
     private List<Map<String, Object>> dataList;
-    private String[][] contentList;
-    private String[] contentTemp;
-    private int[] idList;
+//    private String[][] contentList;
+//    private String[] contentTemp;
+//    private int[] idList;
     private Intent intent;
+    private SQLiteDatabase db;
+    private DatabaseHandler dbHandler;
 
 
     @Override
@@ -70,18 +66,16 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
+//        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+//        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+//                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+//        drawer.setDrawerListener(toggle);
+//        toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
+//        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+//        navigationView.setNavigationItemSelectedListener(this);
 
-        createDatabase();
-        readDatabase();
-
+        initDatabase();
         listView = (ListView) findViewById(R.id.listView);
         fillListView();
         itemOnLongClick();
@@ -92,12 +86,12 @@ public class MainActivity extends AppCompatActivity
         super.onActivityResult(requestCode, resultCode, data);
         if(resultCode == 1) {
             if(requestCode == 0)
-                addItemInDatabase(data.getStringArrayExtra("content"));
+                dbHandler.addItemInDatabase(data.getStringArrayExtra("content"));
             else
-                modifyItemInDatabase(idList[requestCode - 1], data.getStringArrayExtra("content"));
+                dbHandler.modifyItemInDatabase(requestCode - 1, data.getStringArrayExtra("content"));
         }
         else if(resultCode == 2 && requestCode != 0)
-            deleteItemInDatabase(idList[requestCode - 1]);
+            dbHandler.deleteItemInDatabase(requestCode - 1);
         refreshListView();
     }
 
@@ -122,82 +116,89 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void refreshListView() {
-        readDatabase();
+        dbHandler.readDatabase();
         dataList.removeAll(dataList);
         dataList = getData();
         simpleAdapter.notifyDataSetChanged();
     }
 
     private List<Map<String, Object>> getData() {
-        for(int i = 0; i < contentList.length; i++) {
+        for(int i = 0; i < dbHandler.contentList.length; i++) {
             Map<String, Object>map = new HashMap<String, Object>();
             for(int j = 0; j < HEADERLIST.length; j++)
-                map.put(HEADERLIST[j], contentList[i][j]);
+                map.put(HEADERLIST[j], dbHandler.contentList[i][j]);
             dataList.add(map);
         }
         return dataList;
     }
 
-    private void addItemInDatabase(String[] content) {
-        SQLiteDatabase db = openOrCreateDatabase("memo.db", MODE_PRIVATE, null);
-        ContentValues contentValues = new ContentValues();
-        for(int i = 0; i < HEADERLIST.length; i++)
-            contentValues.put(HEADERLIST[i], content[i]);
-        db.insert("memotb", null, contentValues);
-        db.close();
+    private void initDatabase() {
+        db = openOrCreateDatabase("memo.db", MODE_PRIVATE, null);
+        dbHandler = new DatabaseHandler(db, "memotb");
+        dbHandler.createTable();
+        dbHandler.readDatabase();
     }
 
-    private void modifyItemInDatabase(int selectedItem, String[] content) {
-        SQLiteDatabase db = openOrCreateDatabase("memo.db", MODE_PRIVATE, null);
-        ContentValues contentValues = new ContentValues();
-        for(int i = 0; i < HEADERLIST.length; i++)
-            contentValues.put(HEADERLIST[i], content[i]);
-        String whereClause = "_id=?";
-        String[] whereArgs = new String[] {String.valueOf(selectedItem)};
-        db.update("memotb", contentValues, whereClause, whereArgs);
-        db.close();
-    }
+//    private void addItemInDatabase(String[] content) {
+//        SQLiteDatabase db = openOrCreateDatabase("memo.db", MODE_PRIVATE, null);
+//        ContentValues contentValues = new ContentValues();
+//        for(int i = 0; i < HEADERLIST.length; i++)
+//            contentValues.put(HEADERLIST[i], content[i]);
+//        db.insert("memotb", null, contentValues);
+//        db.close();
+//    }
+//
+//    private void modifyItemInDatabase(int selectedItem, String[] content) {
+//        SQLiteDatabase db = openOrCreateDatabase("memo.db", MODE_PRIVATE, null);
+//        ContentValues contentValues = new ContentValues();
+//        for(int i = 0; i < HEADERLIST.length; i++)
+//            contentValues.put(HEADERLIST[i], content[i]);
+//        String whereClause = "_id=?";
+//        String[] whereArgs = new String[] {String.valueOf(selectedItem)};
+//        db.update("memotb", contentValues, whereClause, whereArgs);
+//        db.close();
+//    }
+//
+//    private void deleteItemInDatabase(int selectedItem) {
+//        SQLiteDatabase db = openOrCreateDatabase("memo.db", MODE_PRIVATE, null);
+//        String whereClause = "_id=?";
+//        String[] whereArgs = new String[] {String.valueOf(selectedItem)};
+//        db.delete("memotb", whereClause, whereArgs);
+//        db.close();
+//    }
+//
+//    private void createDatabase() {
+//        SQLiteDatabase db = openOrCreateDatabase("memo.db", MODE_PRIVATE, null);
+//        db.execSQL("create table if not exists memotb (_id integer primary key autoincrement, title text not null, content text not null, date text not null)");
+//        db.close();
+//    }
+//
+//    private void readDatabase() {
+//        SQLiteDatabase db = openOrCreateDatabase("memo.db", MODE_PRIVATE, null);
+//        Cursor cr = db.rawQuery("select * from memotb ORDER BY date desc", null);
+//        idList = new int[cr.getCount()];
+//        contentList = new String[cr.getCount()][4];
+//        if(cr != null) {
+//            for(int i = 0; cr.moveToNext(); i++) {
+//                idList[i] = cr.getInt(cr.getColumnIndex("_id"));
+//                for(int j = 0; j < HEADERLIST.length; j++)
+//                    contentList[i][j] = cr.getString(cr.getColumnIndex(HEADERLIST[j]));
+//            }
+//        }
+//
+//        cr.close();
+//        db.close();
+//    }
 
-    private void deleteItemInDatabase(int selectedItem) {
-        SQLiteDatabase db = openOrCreateDatabase("memo.db", MODE_PRIVATE, null);
-        String whereClause = "_id=?";
-        String[] whereArgs = new String[] {String.valueOf(selectedItem)};
-        db.delete("memotb", whereClause, whereArgs);
-        db.close();
-    }
-
-    private void createDatabase() {
-        SQLiteDatabase db = openOrCreateDatabase("memo.db", MODE_PRIVATE, null);
-        db.execSQL("create table if not exists memotb (_id integer primary key autoincrement, title text not null, content text not null, date text not null)");
-        db.close();
-    }
-
-    private void readDatabase() {
-        SQLiteDatabase db = openOrCreateDatabase("memo.db", MODE_PRIVATE, null);
-        Cursor cr = db.rawQuery("select * from memotb ORDER BY date desc", null);
-        idList = new int[cr.getCount()];
-        contentList = new String[cr.getCount()][4];
-        if(cr != null) {
-            for(int i = 0; cr.moveToNext(); i++) {
-                idList[i] = cr.getInt(cr.getColumnIndex("_id"));
-                for(int j = 0; j < HEADERLIST.length; j++)
-                    contentList[i][j] = cr.getString(cr.getColumnIndex(HEADERLIST[j]));
-            }
-        }
-
-        cr.close();
-        db.close();
-    }
-
-    @Override
-    public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
-    }
+//    @Override
+//    public void onBackPressed() {
+//        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+//        if (drawer.isDrawerOpen(GravityCompat.START)) {
+//            drawer.closeDrawer(GravityCompat.START);
+//        } else {
+//            super.onBackPressed();
+//        }
+//    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -221,34 +222,34 @@ public class MainActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
-        }
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
-    }
+//    @SuppressWarnings("StatementWithEmptyBody")
+//    @Override
+//    public boolean onNavigationItemSelected(MenuItem item) {
+//        // Handle navigation view item clicks here.
+//        int id = item.getItemId();
+//
+//        if (id == R.id.nav_camera) {
+//            // Handle the camera action
+//        } else if (id == R.id.nav_gallery) {
+//
+//        } else if (id == R.id.nav_slideshow) {
+//
+//        } else if (id == R.id.nav_manage) {
+//
+//        } else if (id == R.id.nav_share) {
+//
+//        } else if (id == R.id.nav_send) {
+//
+//        }
+//
+//        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+//        drawer.closeDrawer(GravityCompat.START);
+//        return true;
+//    }
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        intent.putExtra("content", contentList[position]);
+        intent.putExtra("content", dbHandler.contentList[position]);
         startActivityForResult(MainActivity.this.intent, position + 1);
     }
 
@@ -267,14 +268,13 @@ public class MainActivity extends AppCompatActivity
         int position = (int) info.id;
         switch (item.getItemId()) {
             case 0:
-                contentTemp = contentList[position];
-                deleteItemInDatabase(idList[position]);
+                dbHandler.deleteItemInDatabase(position);
                 refreshListView();
                 Snackbar.make(listView, "是否撤销删除", Snackbar.LENGTH_LONG)
                         .setAction("撤销", new View.OnClickListener(){
                             @Override
                             public void onClick(View v) {
-                                addItemInDatabase(contentTemp);
+                                dbHandler.addItemInDatabase(dbHandler.contentTemp);
                                 refreshListView();
                             }
                         })
@@ -282,8 +282,9 @@ public class MainActivity extends AppCompatActivity
                 break;
             case 1:
                 ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-                clipboard.setText(contentList[position][1]);
+                clipboard.setText(dbHandler.contentList[position][1]);
                 Snackbar.make(listView, "已复制到剪贴板", Snackbar.LENGTH_SHORT).show();
+                break;
         }
 
         return super.onContextItemSelected(item);

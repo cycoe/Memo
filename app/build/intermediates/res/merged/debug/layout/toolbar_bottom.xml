@@ -10,14 +10,14 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical|left"
+        android:gravity="center_vertical|start"
         android:orientation="horizontal" >
 
         <ImageButton
             android:id="@+id/undoButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="20dp"
+            android:layout_marginStart="20dp"
             android:background="?android:attr/selectableItemBackgroundBorderless"
             android:src="@mipmap/undo" />
 
@@ -25,7 +25,7 @@
             android:id="@+id/redoButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="20dp"
+            android:layout_marginStart="20dp"
             android:background="?android:attr/selectableItemBackgroundBorderless"
             android:src="@mipmap/redo" />
 
@@ -33,7 +33,7 @@
             android:id="@+id/saveButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="20dp"
+            android:layout_marginStart="20dp"
             android:background="?android:attr/selectableItemBackgroundBorderless"
             android:src="@mipmap/save" />
 
@@ -41,9 +41,41 @@
             android:id="@+id/delButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="20dp"
+            android:layout_marginStart="20dp"
             android:background="?android:attr/selectableItemBackgroundBorderless"
             android:src="@mipmap/del" />
+
+        <ImageButton
+            android:id="@+id/boldButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:src="@mipmap/bold" />
+
+        <ImageButton
+            android:id="@+id/italicButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:src="@mipmap/italic" />
+
+        <ImageButton
+            android:id="@+id/ulButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:src="@mipmap/ul" />
+
+        <ImageButton
+            android:id="@+id/olButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:src="@mipmap/ol" />
 
         <!--<SeekBar-->
             <!--android:id="@+id/sizeChanger"-->

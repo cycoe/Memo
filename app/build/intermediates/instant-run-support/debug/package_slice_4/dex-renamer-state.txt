@@ -1,4 +1,4 @@
-#Wed Aug 02 18:51:42 CST 2017
+#Fri Aug 11 12:26:37 CST 2017
 base.0=/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/transforms/dex/debug/folders/1000/5/slice_4
 renamed.0=classes.dex
 file.0=/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/transforms/dex/debug/folders/1000/5/slice_4/classes.dex

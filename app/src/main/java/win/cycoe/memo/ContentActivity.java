@@ -4,20 +4,16 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.Editable;
-import android.text.Spannable;
-import android.text.SpannableString;
 import android.text.TextWatcher;
-import android.text.style.StyleSpan;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
-import android.widget.SeekBar;
+import android.widget.ProgressBar;
+import android.widget.Switch;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.Toolbar;
 
 import java.text.SimpleDateFormat;
@@ -29,24 +25,40 @@ import java.util.Map;
  * Created by cycoe on 7/27/17.
  */
 
-public class ContentActivity extends Activity implements View.OnClickListener {
+public class ContentActivity extends Activity implements View.OnClickListener, View.OnFocusChangeListener {
 
     // set the constants of resultCodes
     private final int UNMODIFIED = 0;
     private final int MODIFIED = 1;
     private final int DELETE = 2;
-    private final char[] STOPCHARLIST = {' ', '\n', ',', '.', '，', '。', '!', '?', '！', '？'};
+    private final String[][] SPANLIST = {
+            {"**", "**"},
+            {"*", "*"},
+            {"- ", ""},
+            {"1. ", ""},
+    };
 
     private Toolbar itemToolbar;
     private ImageButton undoButton;
     private ImageButton redoButton;
     private ImageButton saveButton;
     private ImageButton delButton;
+    private ImageButton boldButton;
+    private ImageButton italicButton;
+    private ImageButton ulButton;
+    private ImageButton olButton;
+    private Switch mdSwitch;
     private TextView dateView;
     private EditText titleLine;
     private EditText contentLine;
+    private FrameLayout mdLayoutView;
+    private TextView markdownView;
+    private ProgressBar loadProgressBar;
+
     private AlertDialog.Builder builder;
     private ContentStack contentStack;
+    private StopCharHandler stopCharHandler;
+    private MdASyncTask mdASyncTask;
 
     private DialogInterface.OnClickListener clickListenerSave;
     private DialogInterface.OnClickListener clickListenerDel;
@@ -93,6 +105,21 @@ public class ContentActivity extends Activity implements View.OnClickListener {
             case R.id.redoButton:
                 redo();
                 break;
+            case R.id.boldButton:
+                insertSpan(0);
+                break;
+            case R.id.italicButton:
+                insertSpan(1);
+                break;
+            case R.id.ulButton:
+                insertSpan(2);
+                break;
+            case R.id.olButton:
+                insertSpan(3);
+                break;
+            case R.id.mdSwitch:
+                switchMdView();
+                break;
         }
     }
 
@@ -103,18 +130,32 @@ public class ContentActivity extends Activity implements View.OnClickListener {
         dateView = (TextView) findViewById(R.id.dateView);
         titleLine = (EditText) findViewById(R.id.titleLine);
         contentLine = (EditText) findViewById(R.id.contentLine);
+        markdownView = (TextView) findViewById(R.id.markdownView);
+        mdLayoutView = (FrameLayout) findViewById(R.id.mdLayoutView);
         undoButton = (ImageButton) findViewById(R.id.undoButton);
         redoButton = (ImageButton) findViewById(R.id.redoButton);
         saveButton = (ImageButton) findViewById(R.id.saveButton);
         delButton = (ImageButton) findViewById(R.id.delButton);
+        boldButton = (ImageButton) findViewById(R.id.boldButton);
+        italicButton = (ImageButton) findViewById(R.id.italicButton);
+        ulButton = (ImageButton) findViewById(R.id.ulButton);
+        olButton = (ImageButton) findViewById(R.id.olButton);
+        mdSwitch = (Switch) findViewById(R.id.mdSwitch);
+        loadProgressBar = (ProgressBar) findViewById(R.id.loadProgressBar);
 
         setButtonEnabled(saveButton, false);
         setButtonEnabled(undoButton, false);
         setButtonEnabled(redoButton, false);
+        contentLine.setOnFocusChangeListener(this);
         saveButton.setOnClickListener(this);
         delButton.setOnClickListener(this);
         undoButton.setOnClickListener(this);
         redoButton.setOnClickListener(this);
+        boldButton.setOnClickListener(this);
+        italicButton.setOnClickListener(this);
+        ulButton.setOnClickListener(this);
+        olButton.setOnClickListener(this);
+        mdSwitch.setOnClickListener(this);
 
         builder = new AlertDialog.Builder(this);
         builder.setTitle(R.string.tip);
@@ -149,16 +190,19 @@ public class ContentActivity extends Activity implements View.OnClickListener {
 
     // get the Intent Object, get the content string array with key "content"
     private void initData() {
-        content = (String[]) getIntent().getStringArrayExtra("content");
+        content = getIntent().getStringArrayExtra("content");
         contentStack = new ContentStack(10);
         contentStack.put(content[1], content[1].length());
+
+        stopCharHandler = new StopCharHandler();
+        mdASyncTask = new MdASyncTask(markdownView, loadProgressBar);
     }
 
     // create dialog with message and 2 clickListener
     private void createDialog(String message,
                               DialogInterface.OnClickListener positiveListener,
                               DialogInterface.OnClickListener negativeListener) {
-        /*
+        /**
          * 1. setMessage: set the massage to show
          * 2. setPositiveButton(buttonString, clickListener)
          * 3. setNegativeButton(buttonString, clickListener)
@@ -172,7 +216,7 @@ public class ContentActivity extends Activity implements View.OnClickListener {
     }
 
     private void fillView() {
-        /*
+        /**
          * 1. initiate titleLine, contentLine, dateView with content
          * 2. set the dateView unvisible if with no date string
          */
@@ -189,7 +233,7 @@ public class ContentActivity extends Activity implements View.OnClickListener {
     }
 
     private String getNowTime() {
-        /*
+        /**
          * 1. instantiate a dateFormat object with the pattern of "yyyy-MM-dd HH:mm:ss"
          * 2. return the formated date string
          */
@@ -197,47 +241,48 @@ public class ContentActivity extends Activity implements View.OnClickListener {
         return dateFormat.format(new Date());
     }
 
+    private void switchMdView() {
+        mdLayoutView.setVisibility(mdSwitch.isChecked() ? View.VISIBLE : View.GONE);
+        if(mdSwitch.isChecked()) {
+            markdownView.post(new Runnable() {
+                @Override
+                public void run() {
+                    new MdASyncTask(markdownView, loadProgressBar).execute(contentLine.getText().toString());
+                }
+            });
+        }
+    }
+
+    private void insertSpan(int flag) {
+        int start = contentLine.getSelectionStart();
+        int end = contentLine.getSelectionEnd();
+        contentLine.getText().insert(start, SPANLIST[flag][0]);
+        contentLine.getText().insert(end+SPANLIST[flag][0].length(), SPANLIST[flag][1]);
+        contentLine.setSelection(start+SPANLIST[flag][0].length(), end+SPANLIST[flag][0].length());
+    }
+
     private void setToolbar() {
-        /*
+        /**
          * 1. inflateMenu(res/menu/menu.xml): set the flate menu items
          * 2. setNavigationOnClickListener()
          */
 
-        itemToolbar.inflateMenu(R.menu.toolbar_menu);
+//        itemToolbar.inflateMenu(R.menu.toolbar_menu);
         itemToolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 setBackWithConfirm();
             }
         });
-        itemToolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-
-            @Override
-            public boolean onMenuItemClick(MenuItem menuItem) {
-                if(menuItem.getItemId() == R.id.backButton)
-                    setBackWithConfirm();
-                return true;
-            }
-        });
-    }
-
-    private void setTextBold() {
-        SpannableString spanText = new SpannableString(contentLine.getText());
-        int start = contentLine.getSelectionStart();
-        int end = contentLine.getSelectionEnd();
-        spanText.setSpan(new StyleSpan(Typeface.BOLD), start, end, Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
-        contentLine.setText(spanText);
-        contentLine.setSelection(end);
-    }
-
-    private boolean findInList(String content, int position) {
-        if(content.isEmpty())
-            return false;
-        char item = content.charAt(position);
-        for (char stopChar : STOPCHARLIST)
-            if (item == stopChar)
-                return true;
-        return false;
+//        itemToolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+//
+//            @Override
+//            public boolean onMenuItemClick(MenuItem menuItem) {
+//                if(menuItem.getItemId() == R.id.backButton)
+//                    setBackWithConfirm();
+//                return true;
+//            }
+//        });
     }
 
     private void setButtonEnabled(View view, boolean flag) {
@@ -256,7 +301,7 @@ public class ContentActivity extends Activity implements View.OnClickListener {
     }
 
     private void setBackWithConfirm() {
-        /*
+        /**
          * 1. if saveButton is visible, means you need to save before back
          * 2. else if the title and content are both empty, besides, the date is not empty, means
          *    that you delete the content
@@ -276,7 +321,7 @@ public class ContentActivity extends Activity implements View.OnClickListener {
 
     // the exit for upper activity
     private void setBack(boolean modified, int actionFlag) {
-        /*
+        /**
          * 1. initiate a new Intent
          * 2. if content is modified, then replace the content array with new data
          * 3. put the content array into Intent
@@ -301,7 +346,7 @@ public class ContentActivity extends Activity implements View.OnClickListener {
     private void undo() {
         String content = contentLine.getText().toString();
         int length = contentLine.getText().length();
-        if(isisInput && !findInList(content, length - 1))
+        if(isisInput && !stopCharHandler.findInList(content, length - 1))
             contentStack.put(content, length);
         isInput = false;
         Map<String, Object> map = contentStack.undo();
@@ -359,13 +404,18 @@ public class ContentActivity extends Activity implements View.OnClickListener {
                     setButtonEnabled(saveButton, false);
                 else
                     setButtonEnabled(saveButton, true);
+
                 if(isInput) {
                     setButtonEnabled(undoButton, true);
                     setButtonEnabled(redoButton, false);
+
+                    int cursor = start + count;
+                    if(stopCharHandler.findInList(charSequence.toString(), cursor == 0 ? 0 : cursor - 1))
+                        contentStack.put(charSequence.toString(), cursor);
                 }
-                if(isInput && findInList(charSequence.toString(), start + count - 1)) {
-                    contentStack.put(charSequence.toString(), start + count);
-                }
+
+                if(mdSwitch.isChecked())
+                    new MdASyncTask(markdownView, loadProgressBar).execute(contentLine.getText().toString());
             }
 
             @Override
@@ -374,5 +424,21 @@ public class ContentActivity extends Activity implements View.OnClickListener {
                 isInput = true;
             }
         });
+    }
+
+    @Override
+    public void onFocusChange(View view, boolean isFocused) {
+        if(isFocused) {
+            setButtonEnabled(boldButton, true);
+            setButtonEnabled(italicButton, true);
+            setButtonEnabled(ulButton, true);
+            setButtonEnabled(olButton, true);
+        }
+        else {
+            setButtonEnabled(boldButton, false);
+            setButtonEnabled(italicButton, false);
+            setButtonEnabled(ulButton, false);
+            setButtonEnabled(olButton, false);
+        }
     }
 }

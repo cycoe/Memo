@@ -4,6 +4,9 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 /**
  * Created by cycoe on 17-8-12.
@@ -72,6 +75,12 @@ public class DatabaseHandler {
             tbList[i] = cr.getString(0);
 
         cr.close();
+        List<String> tbListTemp = new ArrayList<>();
+        for(String tbName : tbList) {
+            if(!tbName.equals("android_metadata") && !tbName.equals("sqlite_sequence"))
+                tbListTemp.add(tbName);
+        }
+        tbList = tbListTemp.toArray(new String[0]);
     }
 
     public void createTable(String newTableName) {

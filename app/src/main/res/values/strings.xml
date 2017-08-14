@@ -17,6 +17,7 @@
     <string name="copyToClipBoard">复制到剪贴板</string>
     <string name="create">新建</string>
     <string name="rename">重命名</string>
+    <string name="noteRepertory">笔记库</string>
 
 
 </resources>

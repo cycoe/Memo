@@ -10,4 +10,6 @@
     <color name="transGrey">#88888888</color>
     <color name="transparent">#00FFFFFF</color>
     <color name="whiteGrey">#EEEEEE</color>
+    <color name="black">#000000</color>
+    <color name="grey">#888888</color>
 </resources>

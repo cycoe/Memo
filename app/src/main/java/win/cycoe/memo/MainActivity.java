@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private ListView listView;
     private ListView tableView;
     private EditText tableNameInput;
-    private ImageButton newTabButton;
+    private ImageButton newTableButton;
     private SimpleAdapter simpleAdapter;
     private Intent intent;
     private SQLiteDatabase db;
@@ -51,48 +51,21 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private ArrayAdapter<String> arrayAdapter;
     private List<Map<String, Object>> listViewData;
     private ArrayList<String> tableViewData;
-    private int currentPos = 1;
+    private int currentPos = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.drawer_layout);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
 
-        /*
-         * 初始化一个意图 (intent)，跳转至 ContentActivity
-         * 为 fab 按钮设置点击监听
-         * 为 intent 放置额外数据 content
-         *
-         * startActivityForResult(intent, requestcode);
-         * 启动一个带返回值的 activity
-         */
-        intent = new Intent(this, ContentActivity.class);
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                intent.putExtra("content", new String[] {"", "", ""});
-                startActivityForResult(MainActivity.this.intent, 0);
-            }
-        });
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
-
+        initData();
         initDatabase();
-        listView = (ListView) findViewById(R.id.listView);
-        tableView = (ListView) findViewById(R.id.tableView);
-        newTabButton = (ImageButton) findViewById(R.id.newTabButton);
-        newTabButton.setOnClickListener(this);
+        setToolBar();
+        setFloatButton();
+        initView();
         fillTableView();
         fillListView();
         itemOnLongClick();
-        builer = new DialogBuiler(this);
     }
 
     @Override
@@ -107,6 +80,49 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         else if(resultCode == 2 && requestCode != 0)
             dbHandler.deleteItemInDatabase(requestCode - 1);
         refreshListView();
+    }
+
+    private void initData() {
+        intent = new Intent(this, ContentActivity.class);
+        builer = new DialogBuiler(this);
+    }
+
+    private void initView() {
+        listView = (ListView) findViewById(R.id.listView);
+        tableView = (ListView) findViewById(R.id.tableView);
+        newTableButton = (ImageButton) findViewById(R.id.newTabButton);
+
+        newTableButton.setOnClickListener(this);
+    }
+
+    private void setFloatButton() {
+        /**
+         * 初始化一个意图 (intent)，跳转至 ContentActivity
+         * 为 fab 按钮设置点击监听
+         * 为 intent 放置额外数据 content
+         *
+         * startActivityForResult(intent, requestcode);
+         * 启动一个带返回值的 activity
+         */
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                intent.putExtra("content", new String[] {"", "", ""});
+                startActivityForResult(MainActivity.this.intent, 0);
+            }
+        });
+    }
+
+    private void setToolBar() {
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
     }
 
     private void fillListView() {
@@ -173,8 +189,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         db = openOrCreateDatabase("memo.db", MODE_PRIVATE, null);
         dbHandler = new DatabaseHandler(db);
         dbHandler.readTables();
-        dbHandler.handle(dbHandler.tbList[currentPos]);
-        dbHandler.readDatabase();
+        if(dbHandler.tbList.length > 0) {
+            dbHandler.handle(dbHandler.tbList[currentPos]);
+            dbHandler.readDatabase();
+        }
     }
 
     @Override
@@ -242,7 +260,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             @Override
             public void onCreateContextMenu(ContextMenu contextMenu, View view, ContextMenu.ContextMenuInfo contextMenuInfo) {
                 contextMenu.add(1, 0, 0, R.string.rename);
-                contextMenu.add(1, 1, 0, R.string.delete);
+                if(dbHandler.tbList.length > 1)
+                    contextMenu.add(1, 1, 0, R.string.delete);
             }
         });
     }
@@ -297,6 +316,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                 if (!tableNameInput.getText().toString().isEmpty()) {
                                     dbHandler.renameTable(tableNameInput.getText().toString(), position);
                                     refreshTableView();
+                                    setTitle(dbHandler.tbList[position]);
                                 }
                             }
                         })
@@ -315,9 +335,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                 dbHandler.deleteTable(position);
                                 refreshTableView();
                                 if(currentPos == position) {
-                                    dbHandler.handle(dbHandler.tbList[1]);
+                                    currentPos = 0;
+                                    dbHandler.handle(dbHandler.tbList[currentPos]);
                                     refreshListView();
-                                    tableView.setItemChecked(1, true);
+                                    tableView.setItemChecked(currentPos, true);
+                                    setTitle(dbHandler.tbList[currentPos]);
                                     DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
                                     if (drawer.isDrawerOpen(GravityCompat.START)) {
                                         drawer.closeDrawer(GravityCompat.START);

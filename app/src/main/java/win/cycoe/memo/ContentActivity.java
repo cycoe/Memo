@@ -440,12 +440,14 @@ public class ContentActivity extends Activity implements View.OnClickListener, V
             setButtonEnabled(italicButton, true);
             setButtonEnabled(ulButton, true);
             setButtonEnabled(olButton, true);
+            setButtonEnabled(deletelineButton, true);
         }
         else {
             setButtonEnabled(boldButton, false);
             setButtonEnabled(italicButton, false);
             setButtonEnabled(ulButton, false);
             setButtonEnabled(olButton, false);
+            setButtonEnabled(deletelineButton, false);
         }
     }
 }

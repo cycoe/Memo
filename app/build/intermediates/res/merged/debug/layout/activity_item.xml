@@ -32,10 +32,14 @@
                     android:fillViewport="true"
                     android:layout_margin="5dp" >
 
-                    <TextView
+                    <EditText
                         android:id="@+id/markdownView"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
+                        android:layout_height="wrap_content"
+                        android:background="@null"
+                        android:editable="false"
+                        android:textIsSelectable="true"
+                        android:textSize="15sp" />
 
                 </ScrollView>
 

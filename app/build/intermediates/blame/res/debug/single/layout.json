@@ -120,6 +120,10 @@
         "source": "/home/cycoe/AndroidStudioProjects/Memo/app/src/main/res/layout/listitem_layout.xml"
     },
     {
+        "merged": "/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/res/merged/debug/layout/drawer_content_layout.xml",
+        "source": "/home/cycoe/AndroidStudioProjects/Memo/app/src/main/res/layout/drawer_content_layout.xml"
+    },
+    {
         "merged": "/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/res/merged/debug/layout/app_bar_main.xml",
         "source": "/home/cycoe/AndroidStudioProjects/Memo/app/src/main/res/layout/app_bar_main.xml"
     },

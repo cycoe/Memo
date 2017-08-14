@@ -54,12 +54,12 @@ public class ContentActivity extends Activity implements View.OnClickListener, V
     private EditText titleLine;
     private EditText contentLine;
     private FrameLayout mdLayoutView;
-    private TextView markdownView;
+    private EditText markdownView;
     private ProgressBar loadProgressBar;
 
-    private AlertDialog.Builder builder;
     private ContentStack contentStack;
     private StopCharHandler stopCharHandler;
+    private DialogBuiler builer;
     private MdASyncTask mdASyncTask;
 
     private DialogInterface.OnClickListener clickListenerSave;
@@ -135,7 +135,7 @@ public class ContentActivity extends Activity implements View.OnClickListener, V
         dateView = (TextView) findViewById(R.id.dateView);
         titleLine = (EditText) findViewById(R.id.titleLine);
         contentLine = (EditText) findViewById(R.id.contentLine);
-        markdownView = (TextView) findViewById(R.id.markdownView);
+        markdownView = (EditText) findViewById(R.id.markdownView);
         mdLayoutView = (FrameLayout) findViewById(R.id.mdLayoutView);
         undoButton = (ImageButton) findViewById(R.id.undoButton);
         redoButton = (ImageButton) findViewById(R.id.redoButton);
@@ -164,8 +164,6 @@ public class ContentActivity extends Activity implements View.OnClickListener, V
         deletelineButton.setOnClickListener(this);
         mdSwitch.setOnClickListener(this);
 
-        builder = new AlertDialog.Builder(this);
-        builder.setTitle(R.string.tip);
     }
 
     // create different clickListener for dialog
@@ -203,24 +201,26 @@ public class ContentActivity extends Activity implements View.OnClickListener, V
 
         stopCharHandler = new StopCharHandler();
         mdASyncTask = new MdASyncTask(markdownView, loadProgressBar);
+
+        builer = new DialogBuiler(this);
     }
 
-    // create dialog with message and 2 clickListener
-    private void createDialog(String message,
-                              DialogInterface.OnClickListener positiveListener,
-                              DialogInterface.OnClickListener negativeListener) {
-        /**
-         * 1. setMessage: set the massage to show
-         * 2. setPositiveButton(buttonString, clickListener)
-         * 3. setNegativeButton(buttonString, clickListener)
-         * 4. show(): remember to show dialog
-         */
-        builder.setMessage(message);
-        builder.setPositiveButton(R.string.yes,positiveListener);
-        builder.setNegativeButton(R.string.no, negativeListener);
-        builder.show();
-
-    }
+//    // create dialog with message and 2 clickListener
+//    private void createDialog(String message,
+//                              DialogInterface.OnClickListener positiveListener,
+//                              DialogInterface.OnClickListener negativeListener) {
+//        /**
+//         * 1. setMessage: set the massage to show
+//         * 2. setPositiveButton(buttonString, clickListener)
+//         * 3. setNegativeButton(buttonString, clickListener)
+//         * 4. show(): remember to show dialog
+//         */
+//        builder.setMessage(message);
+//        builder.setPositiveButton(R.string.yes,positiveListener);
+//        builder.setNegativeButton(R.string.no, negativeListener);
+//        builder.show();
+//
+//    }
 
     private void fillView() {
         /**
@@ -304,7 +304,7 @@ public class ContentActivity extends Activity implements View.OnClickListener, V
     }
 
     private void deleteWithConfirm() {
-        createDialog("是否删除此便签", clickListenerDel, clickListenerNothing);
+        builer.createDialog("是否删除此便签", clickListenerDel, clickListenerNothing);
     }
 
     private void setBackWithConfirm() {
@@ -315,12 +315,12 @@ public class ContentActivity extends Activity implements View.OnClickListener, V
          * 3. others, go back with no modification
          */
         if(saveButton.isEnabled()) {
-            createDialog("是否保存", clickListenerSave, clickListenerDiscard);
+            builer.createDialog("是否保存", clickListenerSave, clickListenerDiscard);
         }
         else if(titleLine.getText().toString().trim().isEmpty()
                 && contentLine.getText().toString().trim().isEmpty()
                 && !content[2].isEmpty()) {
-            createDialog("是否删除此空白便签", clickListenerDel, clickListenerDiscard);
+            builer.createDialog("是否删除此空白便签", clickListenerDel, clickListenerDiscard);
         }
         else
             setBack(false, UNMODIFIED);

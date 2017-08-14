@@ -1,14 +1,20 @@
 package win.cycoe.memo;
 
+import android.app.AlertDialog;
 import android.content.ClipboardManager;
-import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.text.InputFilter;
+import android.text.InputType;
+import android.text.Spanned;
 import android.view.ContextMenu;
 import android.view.View;
 import android.support.v7.app.AppCompatActivity;
@@ -16,6 +22,9 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 
@@ -25,26 +34,29 @@ import java.util.List;
 import java.util.Map;
 
 
-public class MainActivity extends AppCompatActivity
-        implements AdapterView.OnItemClickListener {
+public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener, View.OnClickListener {
 
     private final String[] HEADERLIST = {"title", "content", "date"};
 
     private ListView listView;
+    private ListView tableView;
+    private EditText tableNameInput;
+    private ImageButton newTabButton;
     private SimpleAdapter simpleAdapter;
-    private List<Map<String, Object>> dataList;
-//    private String[][] contentList;
-//    private String[] contentTemp;
-//    private int[] idList;
     private Intent intent;
     private SQLiteDatabase db;
     private DatabaseHandler dbHandler;
+    private DialogBuiler builer;
 
+    private ArrayAdapter<String> arrayAdapter;
+    private List<Map<String, Object>> listViewData;
+    private ArrayList<String> tableViewData;
+    private int currentPos = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.drawer_layout);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -66,19 +78,21 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-//        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-//        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-//                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-//        drawer.setDrawerListener(toggle);
-//        toggle.syncState();
-
-//        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-//        navigationView.setNavigationItemSelectedListener(this);
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
 
         initDatabase();
         listView = (ListView) findViewById(R.id.listView);
+        tableView = (ListView) findViewById(R.id.tableView);
+        newTabButton = (ImageButton) findViewById(R.id.newTabButton);
+        newTabButton.setOnClickListener(this);
+        fillTableView();
         fillListView();
         itemOnLongClick();
+        builer = new DialogBuiler(this);
     }
 
     @Override
@@ -96,13 +110,13 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void fillListView() {
-        dataList = new ArrayList<Map<String, Object>>();
+        listViewData = new ArrayList<>();
         simpleAdapter = new SimpleAdapter(this,
-                getData(),
+                getListViewData(),
                 R.layout.listitem_layout,
                 HEADERLIST,
                 new int[] {R.id.title, R.id.content, R.id.date});
-        /*
+        /**
          * SimpleAdapter(context, data, resource, from, to)
          * context : 上下文对象
          * data : 特定的泛型的集合，map 组成的 list 集合，每个 map 中的键必须包含 from 中指定的键
@@ -113,92 +127,65 @@ public class MainActivity extends AppCompatActivity
 
         listView.setAdapter(simpleAdapter);
         listView.setOnItemClickListener(this);
+        setTitle(dbHandler.tbList[currentPos]);
+    }
+
+    private void fillTableView() {
+        tableViewData = new ArrayList<>();
+        arrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_single_choice, getTableViewData());
+        tableView.setAdapter(arrayAdapter);
+        tableView.setOnItemClickListener(this);
+        tableView.setItemChecked(currentPos, true);
     }
 
     private void refreshListView() {
         dbHandler.readDatabase();
-        dataList.removeAll(dataList);
-        dataList = getData();
+        listViewData.removeAll(listViewData);
+        listViewData = getListViewData();
         simpleAdapter.notifyDataSetChanged();
     }
 
-    private List<Map<String, Object>> getData() {
+    private void refreshTableView() {
+        dbHandler.readTables();
+        tableViewData.removeAll(tableViewData);
+        tableViewData = getTableViewData();
+        arrayAdapter.notifyDataSetChanged();
+    }
+
+    private List<Map<String, Object>> getListViewData() {
         for(int i = 0; i < dbHandler.contentList.length; i++) {
             Map<String, Object>map = new HashMap<String, Object>();
             for(int j = 0; j < HEADERLIST.length; j++)
                 map.put(HEADERLIST[j], dbHandler.contentList[i][j]);
-            dataList.add(map);
+            listViewData.add(map);
         }
-        return dataList;
+        return listViewData;
+    }
+
+    private ArrayList<String> getTableViewData() {
+        for(int i = 0; i < dbHandler.tbList.length; i++) {
+            tableViewData.add(dbHandler.tbList[i]);
+        }
+        return tableViewData;
     }
 
     private void initDatabase() {
         db = openOrCreateDatabase("memo.db", MODE_PRIVATE, null);
-        dbHandler = new DatabaseHandler(db, "memotb");
-        dbHandler.createTable();
+        dbHandler = new DatabaseHandler(db);
+        dbHandler.readTables();
+        dbHandler.handle(dbHandler.tbList[currentPos]);
         dbHandler.readDatabase();
     }
 
-//    private void addItemInDatabase(String[] content) {
-//        SQLiteDatabase db = openOrCreateDatabase("memo.db", MODE_PRIVATE, null);
-//        ContentValues contentValues = new ContentValues();
-//        for(int i = 0; i < HEADERLIST.length; i++)
-//            contentValues.put(HEADERLIST[i], content[i]);
-//        db.insert("memotb", null, contentValues);
-//        db.close();
-//    }
-//
-//    private void modifyItemInDatabase(int selectedItem, String[] content) {
-//        SQLiteDatabase db = openOrCreateDatabase("memo.db", MODE_PRIVATE, null);
-//        ContentValues contentValues = new ContentValues();
-//        for(int i = 0; i < HEADERLIST.length; i++)
-//            contentValues.put(HEADERLIST[i], content[i]);
-//        String whereClause = "_id=?";
-//        String[] whereArgs = new String[] {String.valueOf(selectedItem)};
-//        db.update("memotb", contentValues, whereClause, whereArgs);
-//        db.close();
-//    }
-//
-//    private void deleteItemInDatabase(int selectedItem) {
-//        SQLiteDatabase db = openOrCreateDatabase("memo.db", MODE_PRIVATE, null);
-//        String whereClause = "_id=?";
-//        String[] whereArgs = new String[] {String.valueOf(selectedItem)};
-//        db.delete("memotb", whereClause, whereArgs);
-//        db.close();
-//    }
-//
-//    private void createDatabase() {
-//        SQLiteDatabase db = openOrCreateDatabase("memo.db", MODE_PRIVATE, null);
-//        db.execSQL("create table if not exists memotb (_id integer primary key autoincrement, title text not null, content text not null, date text not null)");
-//        db.close();
-//    }
-//
-//    private void readDatabase() {
-//        SQLiteDatabase db = openOrCreateDatabase("memo.db", MODE_PRIVATE, null);
-//        Cursor cr = db.rawQuery("select * from memotb ORDER BY date desc", null);
-//        idList = new int[cr.getCount()];
-//        contentList = new String[cr.getCount()][4];
-//        if(cr != null) {
-//            for(int i = 0; cr.moveToNext(); i++) {
-//                idList[i] = cr.getInt(cr.getColumnIndex("_id"));
-//                for(int j = 0; j < HEADERLIST.length; j++)
-//                    contentList[i][j] = cr.getString(cr.getColumnIndex(HEADERLIST[j]));
-//            }
-//        }
-//
-//        cr.close();
-//        db.close();
-//    }
-
-//    @Override
-//    public void onBackPressed() {
-//        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-//        if (drawer.isDrawerOpen(GravityCompat.START)) {
-//            drawer.closeDrawer(GravityCompat.START);
-//        } else {
-//            super.onBackPressed();
-//        }
-//    }
+    @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -222,35 +209,24 @@ public class MainActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-//    @SuppressWarnings("StatementWithEmptyBody")
-//    @Override
-//    public boolean onNavigationItemSelected(MenuItem item) {
-//        // Handle navigation view item clicks here.
-//        int id = item.getItemId();
-//
-//        if (id == R.id.nav_camera) {
-//            // Handle the camera action
-//        } else if (id == R.id.nav_gallery) {
-//
-//        } else if (id == R.id.nav_slideshow) {
-//
-//        } else if (id == R.id.nav_manage) {
-//
-//        } else if (id == R.id.nav_share) {
-//
-//        } else if (id == R.id.nav_send) {
-//
-//        }
-//
-//        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-//        drawer.closeDrawer(GravityCompat.START);
-//        return true;
-//    }
-
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        intent.putExtra("content", dbHandler.contentList[position]);
-        startActivityForResult(MainActivity.this.intent, position + 1);
+        switch(parent.getId()) {
+            case R.id.listView:
+                intent.putExtra("content", dbHandler.contentList[position]);
+                startActivityForResult(MainActivity.this.intent, position + 1);
+                break;
+            case R.id.tableView:
+                dbHandler.handle(dbHandler.tbList[position]);
+                refreshListView();
+                setTitle(dbHandler.tbList[position]);
+                DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                if (drawer.isDrawerOpen(GravityCompat.START)) {
+                    drawer.closeDrawer(GravityCompat.START);
+                }
+                currentPos = position;
+                break;
+        }
     }
 
     private void itemOnLongClick() {
@@ -258,20 +234,26 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onCreateContextMenu(ContextMenu contextMenu, View view, ContextMenu.ContextMenuInfo contextMenuInfo) {
                 contextMenu.add(0, 0, 0, R.string.delete);
-                contextMenu.add(0, 1, 0, "复制到剪贴板");
+                contextMenu.add(0, 1, 0, R.string.copyToClipBoard);
+            }
+        });
+
+        tableView.setOnCreateContextMenuListener(new View.OnCreateContextMenuListener() {
+            @Override
+            public void onCreateContextMenu(ContextMenu contextMenu, View view, ContextMenu.ContextMenuInfo contextMenuInfo) {
+                contextMenu.add(1, 0, 0, R.string.rename);
+                contextMenu.add(1, 1, 0, R.string.delete);
             }
         });
     }
 
-    public boolean onContextItemSelected(MenuItem item) {
-        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-        int position = (int) info.id;
-        switch (item.getItemId()) {
+    private void listViewContextClick(int itemId, int position) {
+        switch (itemId) {
             case 0:
                 dbHandler.deleteItemInDatabase(position);
                 refreshListView();
                 Snackbar.make(listView, "是否撤销删除", Snackbar.LENGTH_LONG)
-                        .setAction("撤销", new View.OnClickListener(){
+                        .setAction("撤销", new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 dbHandler.addItemInDatabase(dbHandler.contentTemp);
@@ -280,13 +262,127 @@ public class MainActivity extends AppCompatActivity
                         })
                         .show();
                 break;
+
             case 1:
                 ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
                 clipboard.setText(dbHandler.contentList[position][1]);
                 Snackbar.make(listView, "已复制到剪贴板", Snackbar.LENGTH_SHORT).show();
                 break;
         }
+    }
 
+    private void tableViewContentClick(int itemId, final int position) {
+        switch (itemId) {
+            case 0:
+                tableNameInput = new EditText(MainActivity.this);
+                InputFilter filter = new InputFilter() {
+                    @Override
+                    public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
+                        if(source.equals(" "))
+                            return "";
+                        else
+                            return null;
+                    }
+                };
+                tableNameInput.setFilters(new InputFilter[] {filter});
+                tableNameInput.setHint(dbHandler.tbList[position]);
+                tableNameInput.setInputType(InputType.TYPE_CLASS_TEXT);
+                tableNameInput.requestFocus();
+                new AlertDialog.Builder(MainActivity.this).setMessage("重命名分类名称")
+                        .setTitle(R.string.tip)
+                        .setView(tableNameInput)
+                        .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                if (!tableNameInput.getText().toString().isEmpty()) {
+                                    dbHandler.renameTable(tableNameInput.getText().toString(), position);
+                                    refreshTableView();
+                                }
+                            }
+                        })
+                        .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                            }
+                        }).show();
+                break;
+
+            case 1:
+                builer.createDialog("是否删除此分类",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                dbHandler.deleteTable(position);
+                                refreshTableView();
+                                if(currentPos == position) {
+                                    dbHandler.handle(dbHandler.tbList[1]);
+                                    refreshListView();
+                                    tableView.setItemChecked(1, true);
+                                    DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                                    if (drawer.isDrawerOpen(GravityCompat.START)) {
+                                        drawer.closeDrawer(GravityCompat.START);
+                                    }
+                                }
+                            }
+                        },
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                            }
+                        });
+                break;
+        }
+    }
+
+    public boolean onContextItemSelected(MenuItem item) {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        int position = (int) info.id;
+        switch(item.getGroupId()) {
+            case 0:
+                listViewContextClick(item.getItemId(), position);
+                break;
+            case 1:
+                tableViewContentClick(item.getItemId(), position);
+                break;
+        }
         return super.onContextItemSelected(item);
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.newTabButton:
+                tableNameInput = new EditText(MainActivity.this);
+                InputFilter filter = new InputFilter() {
+                    @Override
+                    public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
+                        if(source.equals(" "))
+                            return "";
+                        else
+                            return null;
+                    }
+                };
+                tableNameInput.setFilters(new InputFilter[] {filter});
+                tableNameInput.setInputType(InputType.TYPE_CLASS_TEXT);
+                tableNameInput.requestFocus();
+                new AlertDialog.Builder(MainActivity.this).setMessage("输入新建分类名称")
+                        .setTitle(R.string.tip)
+                        .setView(tableNameInput)
+                        .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                if (!tableNameInput.getText().toString().isEmpty()) {
+                                    dbHandler.createTable(tableNameInput.getText().toString());
+                                    refreshTableView();
+                                }
+                            }
+                        })
+                        .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                            }
+                        }).show();
+                break;
+        }
     }
 }

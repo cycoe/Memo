@@ -1,7 +1,6 @@
 package win.cycoe.memo;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,6 +11,7 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
+import android.widget.ScrollView;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toolbar;
@@ -53,6 +53,7 @@ public class ContentActivity extends Activity implements View.OnClickListener, V
     private TextView dateView;
     private EditText titleLine;
     private EditText contentLine;
+    private ScrollView contentView;
     private FrameLayout mdLayoutView;
     private EditText markdownView;
     private ProgressBar loadProgressBar;
@@ -60,7 +61,6 @@ public class ContentActivity extends Activity implements View.OnClickListener, V
     private ContentStack contentStack;
     private StopCharHandler stopCharHandler;
     private DialogBuiler builer;
-    private MdASyncTask mdASyncTask;
 
     private DialogInterface.OnClickListener clickListenerSave;
     private DialogInterface.OnClickListener clickListenerDel;
@@ -75,7 +75,7 @@ public class ContentActivity extends Activity implements View.OnClickListener, V
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_item);
+        setContentView(R.layout.activity_content);
 
         initData();
         initView();
@@ -136,6 +136,7 @@ public class ContentActivity extends Activity implements View.OnClickListener, V
         titleLine = (EditText) findViewById(R.id.titleLine);
         contentLine = (EditText) findViewById(R.id.contentLine);
         markdownView = (EditText) findViewById(R.id.markdownView);
+        contentView = (ScrollView) findViewById(R.id.contentView);
         mdLayoutView = (FrameLayout) findViewById(R.id.mdLayoutView);
         undoButton = (ImageButton) findViewById(R.id.undoButton);
         redoButton = (ImageButton) findViewById(R.id.redoButton);
@@ -200,27 +201,9 @@ public class ContentActivity extends Activity implements View.OnClickListener, V
         contentStack.put(content[1], content[1].length());
 
         stopCharHandler = new StopCharHandler();
-        mdASyncTask = new MdASyncTask(markdownView, loadProgressBar);
 
         builer = new DialogBuiler(this);
     }
-
-//    // create dialog with message and 2 clickListener
-//    private void createDialog(String message,
-//                              DialogInterface.OnClickListener positiveListener,
-//                              DialogInterface.OnClickListener negativeListener) {
-//        /**
-//         * 1. setMessage: set the massage to show
-//         * 2. setPositiveButton(buttonString, clickListener)
-//         * 3. setNegativeButton(buttonString, clickListener)
-//         * 4. show(): remember to show dialog
-//         */
-//        builder.setMessage(message);
-//        builder.setPositiveButton(R.string.yes,positiveListener);
-//        builder.setNegativeButton(R.string.no, negativeListener);
-//        builder.show();
-//
-//    }
 
     private void fillView() {
         /**
@@ -250,6 +233,7 @@ public class ContentActivity extends Activity implements View.OnClickListener, V
 
     private void switchMdView() {
         mdLayoutView.setVisibility(mdSwitch.isChecked() ? View.VISIBLE : View.GONE);
+        contentView.setVisibility(mdSwitch.isChecked() ? View.GONE : View.VISIBLE);
         if(mdSwitch.isChecked()) {
             markdownView.post(new Runnable() {
                 @Override
@@ -304,7 +288,7 @@ public class ContentActivity extends Activity implements View.OnClickListener, V
     }
 
     private void deleteWithConfirm() {
-        builer.createDialog("是否删除此便签", clickListenerDel, clickListenerNothing);
+        builer.createDialog("警告", "是否删除此便签", clickListenerDel, clickListenerNothing);
     }
 
     private void setBackWithConfirm() {
@@ -315,12 +299,12 @@ public class ContentActivity extends Activity implements View.OnClickListener, V
          * 3. others, go back with no modification
          */
         if(saveButton.isEnabled()) {
-            builer.createDialog("是否保存", clickListenerSave, clickListenerDiscard);
+            builer.createDialog("提示", "是否保存", clickListenerSave, clickListenerDiscard);
         }
         else if(titleLine.getText().toString().trim().isEmpty()
                 && contentLine.getText().toString().trim().isEmpty()
                 && !content[2].isEmpty()) {
-            builer.createDialog("是否删除此空白便签", clickListenerDel, clickListenerDiscard);
+            builer.createDialog("提示", "是否删除此空白便签", clickListenerDel, clickListenerDiscard);
         }
         else
             setBack(false, UNMODIFIED);

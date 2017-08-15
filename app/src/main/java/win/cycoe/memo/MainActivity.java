@@ -1,6 +1,5 @@
 package win.cycoe.memo;
 
-import android.app.AlertDialog;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -47,11 +46,20 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private SQLiteDatabase db;
     private DatabaseHandler dbHandler;
     private DialogBuiler builer;
+    private Finder finder;
+
+    private DialogInterface.OnClickListener clickListenerNewTab;
+    private DialogInterface.OnClickListener clickListenerRenameTab;
+    private DialogInterface.OnClickListener clickListenerDelTab;
+    private DialogInterface.OnClickListener clickListenerNothing;
 
     private ArrayAdapter<String> arrayAdapter;
     private List<Map<String, Object>> listViewData;
     private ArrayList<String> tableViewData;
     private int currentPos = 0;
+    private int position;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,9 +68,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         initData();
         initDatabase();
+        initView();
+        initDialogListener();
         setToolBar();
         setFloatButton();
-        initView();
         fillTableView();
         fillListView();
         itemOnLongClick();
@@ -85,12 +94,83 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private void initData() {
         intent = new Intent(this, ContentActivity.class);
         builer = new DialogBuiler(this);
+        finder = new Finder();
+    }
+
+    private void initDialogListener() {
+        clickListenerNothing = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+
+            }
+        };
+        clickListenerNewTab = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                if (!tableNameInput.getText().toString().isEmpty()) {
+                    if(finder.findInList(dbHandler.tbList, tableNameInput.getText().toString()))
+                        Snackbar.make(tableView, "该分类已存在", Snackbar.LENGTH_SHORT).show();
+                    else {
+                        dbHandler.createTable(tableNameInput.getText().toString());
+                        refreshTableView();
+                    }
+                }
+                else
+                    Snackbar.make(tableView, "分类名称不能为空", Snackbar.LENGTH_SHORT).show();
+            }
+        };
+        clickListenerRenameTab = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                if (!tableNameInput.getText().toString().isEmpty()) {
+                    if(finder.findInList(dbHandler.tbList, tableNameInput.getText().toString()))
+                        builer.createDialog("提示", "该分类已存在", clickListenerNothing);
+                    else {
+                        dbHandler.renameTable(tableNameInput.getText().toString(), position);
+                        refreshTableView();
+                        setTitle(dbHandler.tbList[position]);
+                    }
+                }
+                else
+                    builer.createDialog("提示", "分类名称不能为空", clickListenerNothing);
+            }
+        };
+        clickListenerDelTab = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dbHandler.deleteTable(position);
+                refreshTableView();
+                if(currentPos == position) {
+                    currentPos = 0;
+                    dbHandler.handle(dbHandler.tbList[currentPos]);
+                    refreshListView();
+                    tableView.setItemChecked(currentPos, true);
+                    setTitle(dbHandler.tbList[currentPos]);
+                    DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                    if (drawer.isDrawerOpen(GravityCompat.START)) {
+                        drawer.closeDrawer(GravityCompat.START);
+                    }
+                }
+            }
+        };
     }
 
     private void initView() {
         listView = (ListView) findViewById(R.id.listView);
         tableView = (ListView) findViewById(R.id.tableView);
         newTableButton = (ImageButton) findViewById(R.id.newTabButton);
+        tableNameInput = new EditText(this);
+        InputFilter filter = new InputFilter() {
+            @Override
+            public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
+                if(source.equals(" "))
+                    return "";
+                else
+                    return null;
+            }
+        };
+        tableNameInput.setFilters(new InputFilter[] {filter});
+        tableNameInput.setInputType(InputType.TYPE_CLASS_TEXT);
 
         newTableButton.setOnClickListener(this);
     }
@@ -189,10 +269,14 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         db = openOrCreateDatabase("memo.db", MODE_PRIVATE, null);
         dbHandler = new DatabaseHandler(db);
         dbHandler.readTables();
-        if(dbHandler.tbList.length > 0) {
+        if(dbHandler.tbList.length > 0)
             dbHandler.handle(dbHandler.tbList[currentPos]);
-            dbHandler.readDatabase();
+        else {
+            dbHandler.createTable("默认");
+            dbHandler.handle("默认");
         }
+
+        dbHandler.readDatabase();
     }
 
     @Override
@@ -221,6 +305,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            Intent intent = new Intent(MainActivity.this, SettingActivity.class);
+            startActivity(intent);
             return true;
         }
 
@@ -248,6 +334,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     private void itemOnLongClick() {
+
         listView.setOnCreateContextMenuListener(new View.OnCreateContextMenuListener() {
             @Override
             public void onCreateContextMenu(ContextMenu contextMenu, View view, ContextMenu.ContextMenuInfo contextMenuInfo) {
@@ -291,67 +378,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     private void tableViewContentClick(int itemId, final int position) {
+        this.position = position;
         switch (itemId) {
             case 0:
-                tableNameInput = new EditText(MainActivity.this);
-                InputFilter filter = new InputFilter() {
-                    @Override
-                    public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
-                        if(source.equals(" "))
-                            return "";
-                        else
-                            return null;
-                    }
-                };
-                tableNameInput.setFilters(new InputFilter[] {filter});
                 tableNameInput.setHint(dbHandler.tbList[position]);
-                tableNameInput.setInputType(InputType.TYPE_CLASS_TEXT);
-                tableNameInput.requestFocus();
-                new AlertDialog.Builder(MainActivity.this).setMessage("重命名分类名称")
-                        .setTitle(R.string.tip)
-                        .setView(tableNameInput)
-                        .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                if (!tableNameInput.getText().toString().isEmpty()) {
-                                    dbHandler.renameTable(tableNameInput.getText().toString(), position);
-                                    refreshTableView();
-                                    setTitle(dbHandler.tbList[position]);
-                                }
-                            }
-                        })
-                        .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                            }
-                        }).show();
+                builer.createDialog("提示", "请输入新分类的名称", clickListenerRenameTab, clickListenerNothing, tableNameInput);
                 break;
 
             case 1:
-                builer.createDialog("是否删除此分类",
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                dbHandler.deleteTable(position);
-                                refreshTableView();
-                                if(currentPos == position) {
-                                    currentPos = 0;
-                                    dbHandler.handle(dbHandler.tbList[currentPos]);
-                                    refreshListView();
-                                    tableView.setItemChecked(currentPos, true);
-                                    setTitle(dbHandler.tbList[currentPos]);
-                                    DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-                                    if (drawer.isDrawerOpen(GravityCompat.START)) {
-                                        drawer.closeDrawer(GravityCompat.START);
-                                    }
-                                }
-                            }
-                        },
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                            }
-                        });
+                builer.createDialog("警告", "是否删除此分类", clickListenerDelTab, clickListenerNothing);
                 break;
         }
     }
@@ -374,36 +409,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.newTabButton:
-                tableNameInput = new EditText(MainActivity.this);
-                InputFilter filter = new InputFilter() {
-                    @Override
-                    public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
-                        if(source.equals(" "))
-                            return "";
-                        else
-                            return null;
-                    }
-                };
-                tableNameInput.setFilters(new InputFilter[] {filter});
-                tableNameInput.setInputType(InputType.TYPE_CLASS_TEXT);
-                tableNameInput.requestFocus();
-                new AlertDialog.Builder(MainActivity.this).setMessage("输入新建分类名称")
-                        .setTitle(R.string.tip)
-                        .setView(tableNameInput)
-                        .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                if (!tableNameInput.getText().toString().isEmpty()) {
-                                    dbHandler.createTable(tableNameInput.getText().toString());
-                                    refreshTableView();
-                                }
-                            }
-                        })
-                        .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                            }
-                        }).show();
+                tableNameInput.setHint("");
+                builer.createDialog("提示", "输入新建分类名称", clickListenerNewTab, clickListenerNothing, tableNameInput);
                 break;
         }
     }

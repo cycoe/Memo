@@ -38,6 +38,7 @@
                         android:layout_height="wrap_content"
                         android:background="@null"
                         android:editable="false"
+                        android:gravity="top"
                         android:textIsSelectable="true"
                         android:textSize="15sp" />
 
@@ -53,6 +54,7 @@
             </FrameLayout>
 
             <ScrollView
+                android:id="@+id/contentView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:fillViewport="true"

@@ -18,6 +18,9 @@
     <string name="create">新建</string>
     <string name="rename">重命名</string>
     <string name="noteRepertory">笔记库</string>
+    <string name="warning">警告</string>
+    <string name="others">其他</string>
+    <string name="license">开源协议</string>
 
 
 </resources>

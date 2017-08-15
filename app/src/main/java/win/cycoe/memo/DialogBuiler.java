@@ -16,10 +16,31 @@ public class DialogBuiler {
 
     public DialogBuiler(Context context){
         builder = new AlertDialog.Builder(context);
-        builder.setTitle(R.string.tip);
     }
 
-    public void createDialog(String message,
+    public void createDialog(String title,
+                             String message,
+                             DialogInterface.OnClickListener positiveListener,
+                             DialogInterface.OnClickListener negativeListener,
+                             View view) {
+
+        /**
+         * 1. setMessage: set the massage to show
+         * 2. setPositiveButton(buttonString, clickListener)
+         * 3. setNegativeButton(buttonString, clickListener)
+         * 4. show(): remember to show dialog
+         */
+        builder.setTitle(title);
+        builder.setMessage(message);
+        builder.setPositiveButton(R.string.yes,positiveListener);
+        builder.setNegativeButton(R.string.no, negativeListener);
+        builder.setView(view);
+
+        builder.show();
+    }
+
+    public void createDialog(String title,
+                             String message,
                              DialogInterface.OnClickListener positiveListener,
                              DialogInterface.OnClickListener negativeListener) {
 
@@ -29,9 +50,42 @@ public class DialogBuiler {
          * 3. setNegativeButton(buttonString, clickListener)
          * 4. show(): remember to show dialog
          */
+        builder.setTitle(title);
         builder.setMessage(message);
         builder.setPositiveButton(R.string.yes,positiveListener);
         builder.setNegativeButton(R.string.no, negativeListener);
+
+        builder.show();
+    }
+
+    public void createDialog(String title,
+                             String message,
+                             DialogInterface.OnClickListener positiveListener) {
+
+        /**
+         * 1. setMessage: set the massage to show
+         * 2. setPositiveButton(buttonString, clickListener)
+         * 3. setNegativeButton(buttonString, clickListener)
+         * 4. show(): remember to show dialog
+         */
+        builder.setTitle(title);
+        builder.setMessage(message);
+        builder.setPositiveButton(R.string.yes,positiveListener);
+
+        builder.show();
+    }
+
+    public void createDialog(String title, String message) {
+
+        /**
+         * 1. setMessage: set the massage to show
+         * 2. setPositiveButton(buttonString, clickListener)
+         * 3. setNegativeButton(buttonString, clickListener)
+         * 4. show(): remember to show dialog
+         */
+        builder.setTitle(title);
+        builder.setMessage(message);
+
         builder.show();
     }
 

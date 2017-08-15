@@ -58,23 +58,6 @@ public class DialogBuiler {
         builder.show();
     }
 
-    public void createDialog(String title,
-                             String message,
-                             DialogInterface.OnClickListener positiveListener) {
-
-        /**
-         * 1. setMessage: set the massage to show
-         * 2. setPositiveButton(buttonString, clickListener)
-         * 3. setNegativeButton(buttonString, clickListener)
-         * 4. show(): remember to show dialog
-         */
-        builder.setTitle(title);
-        builder.setMessage(message);
-        builder.setPositiveButton(R.string.yes,positiveListener);
-
-        builder.show();
-    }
-
     public void createDialog(String title, String message) {
 
         /**

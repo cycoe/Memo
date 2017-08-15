@@ -32,6 +32,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import win.cycoe.memo.Handler.DatabaseHandler;
+import win.cycoe.memo.Handler.Finder;
+
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener, View.OnClickListener {
 
@@ -124,7 +127,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             public void onClick(DialogInterface dialogInterface, int i) {
                 if (!tableNameInput.getText().toString().isEmpty()) {
                     if(finder.findInList(dbHandler.tbList, tableNameInput.getText().toString()))
-                        builer.createDialog("提示", "该分类已存在", clickListenerNothing);
+                        Snackbar.make(tableView, "该分类已存在", Snackbar.LENGTH_SHORT).show();
                     else {
                         dbHandler.renameTable(tableNameInput.getText().toString(), position);
                         refreshTableView();
@@ -132,7 +135,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     }
                 }
                 else
-                    builer.createDialog("提示", "分类名称不能为空", clickListenerNothing);
+                    Snackbar.make(tableView, "分类名称不能为空", Snackbar.LENGTH_SHORT).show();
             }
         };
         clickListenerDelTab = new DialogInterface.OnClickListener() {
@@ -381,12 +384,24 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         this.position = position;
         switch (itemId) {
             case 0:
+                tableNameInput = new EditText(this);
+                InputFilter filter = new InputFilter() {
+                    @Override
+                    public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
+                        if(source.equals(" "))
+                            return "";
+                        else
+                            return null;
+                    }
+                };
+                tableNameInput.setFilters(new InputFilter[] {filter});
+                tableNameInput.setInputType(InputType.TYPE_CLASS_TEXT);
                 tableNameInput.setHint(dbHandler.tbList[position]);
                 builer.createDialog("提示", "请输入新分类的名称", clickListenerRenameTab, clickListenerNothing, tableNameInput);
                 break;
 
             case 1:
-                builer.createDialog("警告", "是否删除此分类", clickListenerDelTab, clickListenerNothing);
+                builer.createDialog("警告", "是否删除此分类", clickListenerDelTab, clickListenerNothing, null);
                 break;
         }
     }
@@ -409,7 +424,18 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.newTabButton:
-                tableNameInput.setHint("");
+                tableNameInput = new EditText(this);
+                InputFilter filter = new InputFilter() {
+                    @Override
+                    public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
+                        if(source.equals(" "))
+                            return "";
+                        else
+                            return null;
+                    }
+                };
+                tableNameInput.setFilters(new InputFilter[] {filter});
+                tableNameInput.setInputType(InputType.TYPE_CLASS_TEXT);
                 builer.createDialog("提示", "输入新建分类名称", clickListenerNewTab, clickListenerNothing, tableNameInput);
                 break;
         }

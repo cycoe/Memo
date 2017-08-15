@@ -1,20 +1,20 @@
 -- Merging decision tree log ---
 manifest
-ADDED from /home/cycoe/AndroidStudioProjects/Memo/app/src/main/AndroidManifest.xml:2:1-29:12
+ADDED from /home/cycoe/AndroidStudioProjects/Memo/app/src/main/AndroidManifest.xml:2:1-35:12
 	package
-		ADDED from /home/cycoe/AndroidStudioProjects/Memo/app/src/main/AndroidManifest.xml:3:5-29
+		ADDED from /home/cycoe/AndroidStudioProjects/Memo/app/src/main/AndroidManifest.xml:4:5-29
 		INJECTED from /home/cycoe/AndroidStudioProjects/Memo/app/src/main/AndroidManifest.xml
 		INJECTED from /home/cycoe/AndroidStudioProjects/Memo/app/src/main/AndroidManifest.xml
 	android:versionName
 		INJECTED from /home/cycoe/AndroidStudioProjects/Memo/app/src/main/AndroidManifest.xml
 		INJECTED from /home/cycoe/AndroidStudioProjects/Memo/app/src/main/AndroidManifest.xml
 	xmlns:android
-		ADDED from /home/cycoe/AndroidStudioProjects/Memo/app/src/main/AndroidManifest.xml:2:11-69
+		ADDED from /home/cycoe/AndroidStudioProjects/Memo/app/src/main/AndroidManifest.xml:3:5-63
 	android:versionCode
 		INJECTED from /home/cycoe/AndroidStudioProjects/Memo/app/src/main/AndroidManifest.xml
 		INJECTED from /home/cycoe/AndroidStudioProjects/Memo/app/src/main/AndroidManifest.xml
 application
-ADDED from /home/cycoe/AndroidStudioProjects/Memo/app/src/main/AndroidManifest.xml:5:5-27:19
+ADDED from /home/cycoe/AndroidStudioProjects/Memo/app/src/main/AndroidManifest.xml:6:5-33:19
 MERGED from [com.android.support:design:26.0.0-alpha1] /home/cycoe/.android/build-cache/a22c32e9791e9c0d61f5b3a2b20deb84fd7adfd4/output/AndroidManifest.xml:29:5-20
 MERGED from [com.android.support:appcompat-v7:26.0.0-alpha1] /home/cycoe/.android/build-cache/840d6a41ec5f82de4fb4714735f04806d4f773cb/output/AndroidManifest.xml:29:5-20
 MERGED from [com.android.support:animated-vector-drawable:26.0.0-alpha1] /home/cycoe/.android/build-cache/b3ad32f790c7939ee195649bca8dfe1044af2420/output/AndroidManifest.xml:26:5-20
@@ -28,43 +28,51 @@ MERGED from [com.android.support:support-core-utils:26.0.0-alpha1] /home/cycoe/.
 MERGED from [com.android.support:support-compat:26.0.0-alpha1] /home/cycoe/.android/build-cache/98b3591e1d64c869fec490901ab4b70122fce70a/output/AndroidManifest.xml:29:5-20
 MERGED from [com.android.support.constraint:constraint-layout:1.0.2] /home/cycoe/.android/build-cache/699697d075089a990c448e2f36ec242c2be830db/output/AndroidManifest.xml:9:5-20
 	android:label
-		ADDED from /home/cycoe/AndroidStudioProjects/Memo/app/src/main/AndroidManifest.xml:8:9-41
+		ADDED from /home/cycoe/AndroidStudioProjects/Memo/app/src/main/AndroidManifest.xml:9:9-41
 	android:supportsRtl
-		ADDED from /home/cycoe/AndroidStudioProjects/Memo/app/src/main/AndroidManifest.xml:10:9-35
+		ADDED from /home/cycoe/AndroidStudioProjects/Memo/app/src/main/AndroidManifest.xml:11:9-35
 	android:roundIcon
-		ADDED from /home/cycoe/AndroidStudioProjects/Memo/app/src/main/AndroidManifest.xml:9:9-54
+		ADDED from /home/cycoe/AndroidStudioProjects/Memo/app/src/main/AndroidManifest.xml:10:9-54
 	android:allowBackup
-		ADDED from /home/cycoe/AndroidStudioProjects/Memo/app/src/main/AndroidManifest.xml:6:9-35
+		ADDED from /home/cycoe/AndroidStudioProjects/Memo/app/src/main/AndroidManifest.xml:7:9-35
 	android:icon
-		ADDED from /home/cycoe/AndroidStudioProjects/Memo/app/src/main/AndroidManifest.xml:7:9-43
+		ADDED from /home/cycoe/AndroidStudioProjects/Memo/app/src/main/AndroidManifest.xml:8:9-43
 	android:theme
-		ADDED from /home/cycoe/AndroidStudioProjects/Memo/app/src/main/AndroidManifest.xml:11:9-40
+		ADDED from /home/cycoe/AndroidStudioProjects/Memo/app/src/main/AndroidManifest.xml:12:9-40
 activity#win.cycoe.memo.MainActivity
-ADDED from /home/cycoe/AndroidStudioProjects/Memo/app/src/main/AndroidManifest.xml:12:9-21:20
+ADDED from /home/cycoe/AndroidStudioProjects/Memo/app/src/main/AndroidManifest.xml:13:9-22:20
 	android:label
-		ADDED from /home/cycoe/AndroidStudioProjects/Memo/app/src/main/AndroidManifest.xml:14:13-45
+		ADDED from /home/cycoe/AndroidStudioProjects/Memo/app/src/main/AndroidManifest.xml:15:13-45
 	android:theme
-		ADDED from /home/cycoe/AndroidStudioProjects/Memo/app/src/main/AndroidManifest.xml:15:13-56
+		ADDED from /home/cycoe/AndroidStudioProjects/Memo/app/src/main/AndroidManifest.xml:16:13-56
 	android:name
-		ADDED from /home/cycoe/AndroidStudioProjects/Memo/app/src/main/AndroidManifest.xml:13:13-41
+		ADDED from /home/cycoe/AndroidStudioProjects/Memo/app/src/main/AndroidManifest.xml:14:13-41
 intent-filter#android.intent.action.MAIN+android.intent.category.LAUNCHER
-ADDED from /home/cycoe/AndroidStudioProjects/Memo/app/src/main/AndroidManifest.xml:16:13-20:29
+ADDED from /home/cycoe/AndroidStudioProjects/Memo/app/src/main/AndroidManifest.xml:17:13-21:29
 action#android.intent.action.MAIN
-ADDED from /home/cycoe/AndroidStudioProjects/Memo/app/src/main/AndroidManifest.xml:17:17-69
+ADDED from /home/cycoe/AndroidStudioProjects/Memo/app/src/main/AndroidManifest.xml:18:17-69
 	android:name
-		ADDED from /home/cycoe/AndroidStudioProjects/Memo/app/src/main/AndroidManifest.xml:17:25-66
+		ADDED from /home/cycoe/AndroidStudioProjects/Memo/app/src/main/AndroidManifest.xml:18:25-66
 category#android.intent.category.LAUNCHER
-ADDED from /home/cycoe/AndroidStudioProjects/Memo/app/src/main/AndroidManifest.xml:19:17-77
+ADDED from /home/cycoe/AndroidStudioProjects/Memo/app/src/main/AndroidManifest.xml:20:17-77
 	android:name
-		ADDED from /home/cycoe/AndroidStudioProjects/Memo/app/src/main/AndroidManifest.xml:19:27-74
+		ADDED from /home/cycoe/AndroidStudioProjects/Memo/app/src/main/AndroidManifest.xml:20:27-74
 activity#win.cycoe.memo.ContentActivity
-ADDED from /home/cycoe/AndroidStudioProjects/Memo/app/src/main/AndroidManifest.xml:22:9-26:20
+ADDED from /home/cycoe/AndroidStudioProjects/Memo/app/src/main/AndroidManifest.xml:23:9-27:20
 	android:label
-		ADDED from /home/cycoe/AndroidStudioProjects/Memo/app/src/main/AndroidManifest.xml:24:13-45
+		ADDED from /home/cycoe/AndroidStudioProjects/Memo/app/src/main/AndroidManifest.xml:25:13-45
 	android:theme
-		ADDED from /home/cycoe/AndroidStudioProjects/Memo/app/src/main/AndroidManifest.xml:25:13-56
+		ADDED from /home/cycoe/AndroidStudioProjects/Memo/app/src/main/AndroidManifest.xml:26:13-56
 	android:name
-		ADDED from /home/cycoe/AndroidStudioProjects/Memo/app/src/main/AndroidManifest.xml:23:13-44
+		ADDED from /home/cycoe/AndroidStudioProjects/Memo/app/src/main/AndroidManifest.xml:24:13-44
+activity#win.cycoe.memo.SettingActivity
+ADDED from /home/cycoe/AndroidStudioProjects/Memo/app/src/main/AndroidManifest.xml:28:9-32:20
+	android:label
+		ADDED from /home/cycoe/AndroidStudioProjects/Memo/app/src/main/AndroidManifest.xml:30:13-45
+	android:theme
+		ADDED from /home/cycoe/AndroidStudioProjects/Memo/app/src/main/AndroidManifest.xml:31:13-56
+	android:name
+		ADDED from /home/cycoe/AndroidStudioProjects/Memo/app/src/main/AndroidManifest.xml:29:13-44
 uses-sdk
 INJECTED from /home/cycoe/AndroidStudioProjects/Memo/app/src/main/AndroidManifest.xml reason: use-sdk injection requested
 MERGED from [com.android.support:design:26.0.0-alpha1] /home/cycoe/.android/build-cache/a22c32e9791e9c0d61f5b3a2b20deb84fd7adfd4/output/AndroidManifest.xml:21:5-23:62

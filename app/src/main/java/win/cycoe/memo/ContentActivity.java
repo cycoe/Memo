@@ -3,6 +3,7 @@ package win.cycoe.memo;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -19,6 +20,10 @@ import android.widget.Toolbar;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
+
+import win.cycoe.memo.Handler.ConfigHandler;
+import win.cycoe.memo.Handler.ContentStack;
+import win.cycoe.memo.Handler.StopCharHandler;
 
 
 /**
@@ -42,7 +47,6 @@ public class ContentActivity extends Activity implements View.OnClickListener, V
     private Toolbar itemToolbar;
     private ImageButton undoButton;
     private ImageButton redoButton;
-    private ImageButton saveButton;
     private ImageButton delButton;
     private ImageButton boldButton;
     private ImageButton italicButton;
@@ -61,6 +65,8 @@ public class ContentActivity extends Activity implements View.OnClickListener, V
     private ContentStack contentStack;
     private StopCharHandler stopCharHandler;
     private DialogBuiler builer;
+    private SharedPreferences pref;
+    private ConfigHandler configHandler;
 
     private DialogInterface.OnClickListener clickListenerSave;
     private DialogInterface.OnClickListener clickListenerDel;
@@ -70,6 +76,7 @@ public class ContentActivity extends Activity implements View.OnClickListener, V
     private String[] content = new String[3];
     private boolean isInput = true;
     private boolean isisInput = true;
+    private boolean isModified = false;
 
 
     @Override
@@ -95,9 +102,6 @@ public class ContentActivity extends Activity implements View.OnClickListener, V
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.saveButton:
-                setBack(true, MODIFIED);
-                break;
             case R.id.delButton:
                 deleteWithConfirm();
                 break;
@@ -140,7 +144,6 @@ public class ContentActivity extends Activity implements View.OnClickListener, V
         mdLayoutView = (FrameLayout) findViewById(R.id.mdLayoutView);
         undoButton = (ImageButton) findViewById(R.id.undoButton);
         redoButton = (ImageButton) findViewById(R.id.redoButton);
-        saveButton = (ImageButton) findViewById(R.id.saveButton);
         delButton = (ImageButton) findViewById(R.id.delButton);
         boldButton = (ImageButton) findViewById(R.id.boldButton);
         italicButton = (ImageButton) findViewById(R.id.italicButton);
@@ -150,11 +153,9 @@ public class ContentActivity extends Activity implements View.OnClickListener, V
         mdSwitch = (Switch) findViewById(R.id.mdSwitch);
         loadProgressBar = (ProgressBar) findViewById(R.id.loadProgressBar);
 
-        setButtonEnabled(saveButton, false);
         setButtonEnabled(undoButton, false);
         setButtonEnabled(redoButton, false);
         contentLine.setOnFocusChangeListener(this);
-        saveButton.setOnClickListener(this);
         delButton.setOnClickListener(this);
         undoButton.setOnClickListener(this);
         redoButton.setOnClickListener(this);
@@ -203,6 +204,9 @@ public class ContentActivity extends Activity implements View.OnClickListener, V
         stopCharHandler = new StopCharHandler();
 
         builer = new DialogBuiler(this);
+
+        pref = getSharedPreferences("config", MODE_PRIVATE);
+        configHandler = new ConfigHandler(pref);
     }
 
     private void fillView() {
@@ -233,7 +237,8 @@ public class ContentActivity extends Activity implements View.OnClickListener, V
 
     private void switchMdView() {
         mdLayoutView.setVisibility(mdSwitch.isChecked() ? View.VISIBLE : View.GONE);
-        contentView.setVisibility(mdSwitch.isChecked() ? View.GONE : View.VISIBLE);
+        if(configHandler.getValue("fullScreen") == 1)
+            contentView.setVisibility(mdSwitch.isChecked() ? View.GONE : View.VISIBLE);
         if(mdSwitch.isChecked()) {
             markdownView.post(new Runnable() {
                 @Override
@@ -262,7 +267,10 @@ public class ContentActivity extends Activity implements View.OnClickListener, V
         itemToolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                setBackWithConfirm();
+                if(isModified)
+                    setBack(true, MODIFIED);
+                else
+                    setBack(false, UNMODIFIED);
             }
         });
 //        itemToolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
@@ -298,13 +306,13 @@ public class ContentActivity extends Activity implements View.OnClickListener, V
          *    that you delete the content
          * 3. others, go back with no modification
          */
-        if(saveButton.isEnabled()) {
-            builer.createDialog("提示", "是否保存", clickListenerSave, clickListenerDiscard);
-        }
-        else if(titleLine.getText().toString().trim().isEmpty()
-                && contentLine.getText().toString().trim().isEmpty()
-                && !content[2].isEmpty()) {
-            builer.createDialog("提示", "是否删除此空白便签", clickListenerDel, clickListenerDiscard);
+        if(isModified) {
+            if(titleLine.getText().toString().trim().isEmpty()
+                    && contentLine.getText().toString().trim().isEmpty()
+                    && !content[2].isEmpty())
+                builer.createDialog("警告", "是否删除此空白便签", clickListenerDel, clickListenerDiscard);
+            else
+                builer.createDialog("提示", "是否保存", clickListenerSave, clickListenerDiscard);
         }
         else
             setBack(false, UNMODIFIED);
@@ -372,10 +380,9 @@ public class ContentActivity extends Activity implements View.OnClickListener, V
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                if(charSequence.toString().trim().isEmpty() && contentLine.getText().toString().trim().isEmpty())
-                    setButtonEnabled(saveButton, false);
-                else
-                    setButtonEnabled(saveButton, true);
+                itemToolbar.setNavigationIcon(R.mipmap.done);
+                itemToolbar.setNavigationIcon(R.mipmap.done);
+                isModified = true;
             }
 
             @Override
@@ -391,10 +398,9 @@ public class ContentActivity extends Activity implements View.OnClickListener, V
 
             @Override
             public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
-                if(titleLine.getText().toString().trim().isEmpty() && charSequence.toString().trim().isEmpty())
-                    setButtonEnabled(saveButton, false);
-                else
-                    setButtonEnabled(saveButton, true);
+                itemToolbar.setNavigationIcon(R.mipmap.done);
+                itemToolbar.setNavigationIcon(R.mipmap.done);
+                isModified = true;
 
                 if(isInput) {
                     setButtonEnabled(undoButton, true);

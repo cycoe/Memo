@@ -4,10 +4,6 @@
         "source": "/home/cycoe/AndroidStudioProjects/Memo/app/src/main/res/menu/main.xml"
     },
     {
-        "merged": "/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/res/merged/release/menu/activity_main_drawer.xml",
-        "source": "/home/cycoe/AndroidStudioProjects/Memo/app/src/main/res/menu/activity_main_drawer.xml"
-    },
-    {
         "merged": "/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/res/merged/release/menu/toolbar_menu.xml",
         "source": "/home/cycoe/AndroidStudioProjects/Memo/app/src/main/res/menu/toolbar_menu.xml"
     }

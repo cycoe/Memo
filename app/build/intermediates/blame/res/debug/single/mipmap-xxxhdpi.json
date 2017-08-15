@@ -8,12 +8,16 @@
         "source": "/home/cycoe/AndroidStudioProjects/Memo/app/src/main/res/mipmap-xxxhdpi/bold.png"
     },
     {
+        "merged": "/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/res/merged/debug/mipmap-xxxhdpi/ul.png",
+        "source": "/home/cycoe/AndroidStudioProjects/Memo/app/src/main/res/mipmap-xxxhdpi/ul.png"
+    },
+    {
         "merged": "/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/res/merged/debug/mipmap-xxxhdpi/ol.png",
         "source": "/home/cycoe/AndroidStudioProjects/Memo/app/src/main/res/mipmap-xxxhdpi/ol.png"
     },
     {
-        "merged": "/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/res/merged/debug/mipmap-xxxhdpi/ul.png",
-        "source": "/home/cycoe/AndroidStudioProjects/Memo/app/src/main/res/mipmap-xxxhdpi/ul.png"
+        "merged": "/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/res/merged/debug/mipmap-xxxhdpi/done.png",
+        "source": "/home/cycoe/AndroidStudioProjects/Memo/app/src/main/res/mipmap-xxxhdpi/done.png"
     },
     {
         "merged": "/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/res/merged/debug/mipmap-xxxhdpi/share.png",
@@ -28,16 +32,16 @@
         "source": "/home/cycoe/AndroidStudioProjects/Memo/app/src/main/res/mipmap-xxxhdpi/italic.png"
     },
     {
-        "merged": "/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/res/merged/debug/mipmap-xxxhdpi/ic_launcher.png",
-        "source": "/home/cycoe/AndroidStudioProjects/Memo/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png"
-    },
-    {
         "merged": "/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/res/merged/debug/mipmap-xxxhdpi/redo.png",
         "source": "/home/cycoe/AndroidStudioProjects/Memo/app/src/main/res/mipmap-xxxhdpi/redo.png"
     },
     {
         "merged": "/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/res/merged/debug/mipmap-xxxhdpi/nav_background.png",
         "source": "/home/cycoe/AndroidStudioProjects/Memo/app/src/main/res/mipmap-xxxhdpi/nav_background.png"
+    },
+    {
+        "merged": "/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/res/merged/debug/mipmap-xxxhdpi/ic_launcher.png",
+        "source": "/home/cycoe/AndroidStudioProjects/Memo/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png"
     },
     {
         "merged": "/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/res/merged/debug/mipmap-xxxhdpi/underline.png",
@@ -52,12 +56,12 @@
         "source": "/home/cycoe/AndroidStudioProjects/Memo/app/src/main/res/mipmap-xxxhdpi/deleteline.png"
     },
     {
-        "merged": "/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/res/merged/debug/mipmap-xxxhdpi/del.png",
-        "source": "/home/cycoe/AndroidStudioProjects/Memo/app/src/main/res/mipmap-xxxhdpi/del.png"
-    },
-    {
         "merged": "/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/res/merged/debug/mipmap-xxxhdpi/markdown.png",
         "source": "/home/cycoe/AndroidStudioProjects/Memo/app/src/main/res/mipmap-xxxhdpi/markdown.png"
+    },
+    {
+        "merged": "/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/res/merged/debug/mipmap-xxxhdpi/del.png",
+        "source": "/home/cycoe/AndroidStudioProjects/Memo/app/src/main/res/mipmap-xxxhdpi/del.png"
     },
     {
         "merged": "/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/res/merged/debug/mipmap-xxxhdpi/back.png",

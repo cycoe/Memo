@@ -272,13 +272,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         db = openOrCreateDatabase("memo.db", MODE_PRIVATE, null);
         dbHandler = new DatabaseHandler(db);
         dbHandler.readTables();
-        if(dbHandler.tbList.length > 0)
-            dbHandler.handle(dbHandler.tbList[currentPos]);
-        else {
+        if(dbHandler.tbList.length == 0)
             dbHandler.createTable("默认");
-            dbHandler.handle("默认");
-        }
-
+        dbHandler.readTables();
+        dbHandler.handle(dbHandler.tbList[currentPos]);
         dbHandler.readDatabase();
     }
 

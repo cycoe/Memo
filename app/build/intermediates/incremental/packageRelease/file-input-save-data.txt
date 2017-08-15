@@ -1,5 +1,5 @@
 #Internal package file, do not edit.
-#Tue Aug 15 14:31:28 CST 2017
+#Tue Aug 15 14:54:14 CST 2017
 20.base=/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/res/resources-release.ap_
 143.base=/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/res/resources-release.ap_
 493.base=/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/res/resources-release.ap_

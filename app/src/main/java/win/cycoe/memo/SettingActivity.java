@@ -98,25 +98,30 @@ public class SettingActivity extends Activity implements AdapterView.OnItemClick
         finish();
     }
 
+    private void openLicense() {
+        InputStream is = getResources().openRawResource(R.raw.license);
+        InputStreamReader isr = new InputStreamReader(is);
+        BufferedReader br = new BufferedReader(isr);
+        license = "";
+        try {
+            for (String out = ""; out != null; out = br.readLine()) {
+                license += out;
+                license += "\n";
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        builer.createDialog("License", license);
+    }
+
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
         switch (adapterView.getId()) {
             case R.id.listViewOthers:
                 switch (position) {
                     case 0:
-                        InputStream is = getResources().openRawResource(R.raw.license);
-                        InputStreamReader isr = new InputStreamReader(is);
-                        BufferedReader br = new BufferedReader(isr);
-                        license = "";
-                        try {
-                            for (String out = ""; out != null; out = br.readLine()) {
-                                license += out;
-                                license += "\n";
-                            }
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                        builer.createDialog("License", license);
+                        openLicense();
+                        break;
                 }
                 break;
             case R.id.listViewEditor:
@@ -124,6 +129,7 @@ public class SettingActivity extends Activity implements AdapterView.OnItemClick
                     case 0:
                         break;
                 }
+                break;
         }
     }
 }

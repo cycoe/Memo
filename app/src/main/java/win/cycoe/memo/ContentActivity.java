@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -17,13 +18,17 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toolbar;
 
+import com.zzhoujay.richtext.RichText;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 
 import win.cycoe.memo.Handler.ConfigHandler;
 import win.cycoe.memo.Handler.ContentStack;
+import win.cycoe.memo.Handler.MdASyncTask;
 import win.cycoe.memo.Handler.StopCharHandler;
+import win.cycoe.memo.Handler.UriToPathUtil;
 
 
 /**
@@ -47,6 +52,7 @@ public class ContentActivity extends Activity implements View.OnClickListener, V
     private Toolbar itemToolbar;
     private ImageButton undoButton;
     private ImageButton redoButton;
+    private ImageButton photoButton;
     private ImageButton delButton;
     private ImageButton boldButton;
     private ImageButton italicButton;
@@ -111,6 +117,9 @@ public class ContentActivity extends Activity implements View.OnClickListener, V
             case R.id.redoButton:
                 redo();
                 break;
+            case R.id.photoButton:
+                selectPhoto();
+                break;
             case R.id.boldButton:
                 insertSpan(0);
                 break;
@@ -144,6 +153,7 @@ public class ContentActivity extends Activity implements View.OnClickListener, V
         mdLayoutView = (FrameLayout) findViewById(R.id.mdLayoutView);
         undoButton = (ImageButton) findViewById(R.id.undoButton);
         redoButton = (ImageButton) findViewById(R.id.redoButton);
+        photoButton = (ImageButton) findViewById(R.id.photoButton);
         delButton = (ImageButton) findViewById(R.id.delButton);
         boldButton = (ImageButton) findViewById(R.id.boldButton);
         italicButton = (ImageButton) findViewById(R.id.italicButton);
@@ -159,6 +169,7 @@ public class ContentActivity extends Activity implements View.OnClickListener, V
         delButton.setOnClickListener(this);
         undoButton.setOnClickListener(this);
         redoButton.setOnClickListener(this);
+        photoButton.setOnClickListener(this);
         boldButton.setOnClickListener(this);
         italicButton.setOnClickListener(this);
         ulButton.setOnClickListener(this);
@@ -239,14 +250,8 @@ public class ContentActivity extends Activity implements View.OnClickListener, V
         mdLayoutView.setVisibility(mdSwitch.isChecked() ? View.VISIBLE : View.GONE);
         if(configHandler.getValue("fullScreen") == 1)
             contentView.setVisibility(mdSwitch.isChecked() ? View.GONE : View.VISIBLE);
-        if(mdSwitch.isChecked()) {
-            markdownView.post(new Runnable() {
-                @Override
-                public void run() {
-                    new MdASyncTask(markdownView, loadProgressBar).execute(contentLine.getText().toString());
-                }
-            });
-        }
+        if(mdSwitch.isChecked())
+            new MdASyncTask(markdownView, loadProgressBar).execute(contentLine.getText().toString());
     }
 
     private void insertSpan(int flag) {
@@ -333,7 +338,30 @@ public class ContentActivity extends Activity implements View.OnClickListener, V
         data.putExtra("content", content);
         setResult(actionFlag, data);
 
+        RichText.clear(this);
         finish();
+    }
+
+    private void selectPhoto() {
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(intent, 1);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(resultCode == RESULT_OK) {
+            Uri uri = data.getData();
+            UriToPathUtil uriToPathUtil = new UriToPathUtil();
+            String path = uriToPathUtil.getImageAbsolutePath(this, uri);
+            String fullPath = "![img](" + path + ")";
+
+            int start = contentLine.getSelectionStart();
+            contentLine.getText().insert(start, fullPath);
+        }
+
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     private void saveContent() {

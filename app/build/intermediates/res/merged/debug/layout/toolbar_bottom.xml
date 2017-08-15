@@ -30,6 +30,14 @@
             android:src="@mipmap/redo" />
 
         <ImageButton
+            android:id="@+id/photoButton"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginStart="20dp"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:src="@mipmap/photo" />
+
+        <ImageButton
             android:id="@+id/delButton"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"

@@ -6,14 +6,14 @@ package win.cycoe.memo.Handler;
 
 public class StopCharHandler {
 
-    private final char[] STOPCHARLIST = {' ', '\n', ',', '.', '，', '。', '!', '?', '！', '？', '+', '-', '*', '#', '/'};
+    private final String[] STOPCHARLIST = {" ", "\n", ",", ".", "，", "。", "!", "?", "！", "？", "+", "-", "*", "#", "/"};
 
-    public boolean findInList(String content, int position) {
+    public boolean findInList(String content) {
         if(content.isEmpty())
             return false;
-        char item = content.charAt(position);
-        for (char stopChar : STOPCHARLIST)
-            if (item == stopChar)
+//        char item = content.charAt(position);
+        for (String stopChar : STOPCHARLIST)
+            if (content.contains(stopChar))
                 return true;
         return false;
     }

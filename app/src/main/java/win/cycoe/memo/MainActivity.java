@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     private ArrayAdapter<String> arrayAdapter;
     private List<Map<String, Object>> listViewData;
-    private ArrayList<String> tableViewData;
+    private List<String> tableViewData;
     private int currentPos = 0;
     private int position;
 
@@ -240,14 +240,14 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private void refreshListView() {
         dbHandler.readDatabase();
         listViewData.removeAll(listViewData);
-        listViewData = getListViewData();
+        getListViewData();
         simpleAdapter.notifyDataSetChanged();
     }
 
     private void refreshTableView() {
         dbHandler.readTables();
         tableViewData.removeAll(tableViewData);
-        tableViewData = getTableViewData();
+        getTableViewData();
         arrayAdapter.notifyDataSetChanged();
     }
 
@@ -261,10 +261,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         return listViewData;
     }
 
-    private ArrayList<String> getTableViewData() {
-        for(int i = 0; i < dbHandler.tbList.length; i++) {
+    private List<String> getTableViewData() {
+        for(int i = 0; i < dbHandler.tbList.length; i++)
             tableViewData.add(dbHandler.tbList[i]);
-        }
         return tableViewData;
     }
 

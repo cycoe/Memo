@@ -1,0 +1,10 @@
+[
+    {
+        "merged": "/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/res/merged/release/anim-v21/design_bottom_sheet_slide_in.xml",
+        "source": "/home/cycoe/.android/build-cache/a22c32e9791e9c0d61f5b3a2b20deb84fd7adfd4/output/res/anim-v21/design_bottom_sheet_slide_in.xml"
+    },
+    {
+        "merged": "/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/res/merged/release/anim-v21/design_bottom_sheet_slide_out.xml",
+        "source": "/home/cycoe/.android/build-cache/a22c32e9791e9c0d61f5b3a2b20deb84fd7adfd4/output/res/anim-v21/design_bottom_sheet_slide_out.xml"
+    }
+]

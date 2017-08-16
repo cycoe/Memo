@@ -5,8 +5,7 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
-    <string name="action_settings">设置</string>
-
+    <string name="setting">设置</string>
     <string name="title">标题</string>
     <string name="content">内容</string>
     <string name="yes">是</string>
@@ -22,6 +21,8 @@
     <string name="others">其他</string>
     <string name="license">开源协议</string>
     <string name="edit">编辑</string>
+    <string name="addNew">新建</string>
+    <string name="about">关于</string>
 
 
 </resources>

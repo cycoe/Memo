@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <android.support.design.widget.AppBarLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.AppBarOverlay" >
+
+        <Toolbar
+            android:id="@+id/aboutToolbar"
+            android:layout_height="?attr/actionBarSize"
+            android:title="@string/about"
+            android:layout_width="match_parent"
+            android:navigationIcon="@mipmap/back"
+            android:background="?attr/colorPrimary"
+            app:popupTheme="@style/AppTheme.PopupOverlay" >
+
+        </Toolbar>
+
+    </android.support.design.widget.AppBarLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center" >
+
+        <ImageView
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_margin="@dimen/activity_vertical_margin"
+            android:src="@mipmap/ic_launcher"
+            android:layout_gravity="center" />
+
+        <TextView
+            android:id="@+id/aboutView"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_margin="@dimen/activity_vertical_margin"
+            android:textColor="@color/black"
+            android:autoLink="all" />
+
+    </LinearLayout>
+
+</LinearLayout>

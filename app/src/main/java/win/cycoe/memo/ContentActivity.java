@@ -1,6 +1,7 @@
 package win.cycoe.memo;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -9,6 +10,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
@@ -27,6 +29,7 @@ import java.util.Map;
 import win.cycoe.memo.Handler.ConfigHandler;
 import win.cycoe.memo.Handler.ContentStack;
 import win.cycoe.memo.Handler.MdASyncTask;
+import win.cycoe.memo.Handler.SpanHandler;
 import win.cycoe.memo.Handler.StopCharHandler;
 import win.cycoe.memo.Handler.UriToPathUtil;
 
@@ -41,13 +44,13 @@ public class ContentActivity extends Activity implements View.OnClickListener, V
     private final int UNMODIFIED = 0;
     private final int MODIFIED = 1;
     private final int DELETE = 2;
-    private final String[][] SPANLIST = {
-            {"**", "**"},
-            {"*", "*"},
-            {"- ", ""},
-            {"1. ", ""},
-            {"~~", "~~"},
-    };
+//    private final String[][] SPANLIST = {
+//            {"**", "**"},
+//            {"*", "*"},
+//            {"- ", ""},
+//            {"1. ", ""},
+//            {"~~", "~~"},
+//    };
 
     private Toolbar itemToolbar;
     private ImageButton undoButton;
@@ -73,6 +76,7 @@ public class ContentActivity extends Activity implements View.OnClickListener, V
     private DialogBuiler builer;
     private SharedPreferences pref;
     private ConfigHandler configHandler;
+    private SpanHandler spanHandler;
 
     private DialogInterface.OnClickListener clickListenerSave;
     private DialogInterface.OnClickListener clickListenerDel;
@@ -90,8 +94,8 @@ public class ContentActivity extends Activity implements View.OnClickListener, V
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_content);
 
-        initData();
         initView();
+        initData();
         initDialogListener();
         fillView();
         setToolbar();
@@ -121,19 +125,19 @@ public class ContentActivity extends Activity implements View.OnClickListener, V
                 selectPhoto();
                 break;
             case R.id.boldButton:
-                insertSpan(0);
+                spanHandler.insertSpan(0);
                 break;
             case R.id.italicButton:
-                insertSpan(1);
+                spanHandler.insertSpan(1);
                 break;
             case R.id.ulButton:
-                insertSpan(2);
+                spanHandler.insertSpan(2);
                 break;
             case R.id.olButton:
-                insertSpan(3);
+                spanHandler.insertSpan(3);
                 break;
             case R.id.deletelineButton:
-                insertSpan(4);
+                spanHandler.insertSpan(4);
                 break;
             case R.id.mdSwitch:
                 switchMdView();
@@ -213,6 +217,7 @@ public class ContentActivity extends Activity implements View.OnClickListener, V
         contentStack.put(content[1], content[1].length());
 
         stopCharHandler = new StopCharHandler();
+        spanHandler = new SpanHandler(contentLine);
 
         builer = new DialogBuiler(this);
 
@@ -248,19 +253,23 @@ public class ContentActivity extends Activity implements View.OnClickListener, V
 
     private void switchMdView() {
         mdLayoutView.setVisibility(mdSwitch.isChecked() ? View.VISIBLE : View.GONE);
-        if(configHandler.getValue("fullScreen") == 1)
+        if(configHandler.getValue("fullScreen") == 1) {
             contentView.setVisibility(mdSwitch.isChecked() ? View.GONE : View.VISIBLE);
+        }
         if(mdSwitch.isChecked())
-            new MdASyncTask(markdownView, loadProgressBar).execute(contentLine.getText().toString());
+            new MdASyncTask(markdownView, loadProgressBar, configHandler.getValue("showBorder") == 1)
+                    .execute(contentLine.getText().toString());
+        else
+            contentLine.requestFocus();
     }
 
-    private void insertSpan(int flag) {
-        int start = contentLine.getSelectionStart();
-        int end = contentLine.getSelectionEnd();
-        contentLine.getText().insert(start, SPANLIST[flag][0]);
-        contentLine.getText().insert(end+SPANLIST[flag][0].length(), SPANLIST[flag][1]);
-        contentLine.setSelection(start+SPANLIST[flag][0].length(), end+SPANLIST[flag][0].length());
-    }
+//    private void insertSpan(int flag) {
+//        int start = contentLine.getSelectionStart();
+//        int end = contentLine.getSelectionEnd();
+//        contentLine.getText().insert(start, SPANLIST[flag][0]);
+//        contentLine.getText().insert(end+SPANLIST[flag][0].length(), SPANLIST[flag][1]);
+//        contentLine.setSelection(start+SPANLIST[flag][0].length(), end+SPANLIST[flag][0].length());
+//    }
 
     private void setToolbar() {
         /**
@@ -357,8 +366,7 @@ public class ContentActivity extends Activity implements View.OnClickListener, V
             String path = uriToPathUtil.getImageAbsolutePath(this, uri);
             String fullPath = "![img](" + path + ")";
 
-            int start = contentLine.getSelectionStart();
-            contentLine.getText().insert(start, fullPath);
+            spanHandler.insertUrl(fullPath);
         }
 
         super.onActivityResult(requestCode, resultCode, data);
@@ -373,7 +381,7 @@ public class ContentActivity extends Activity implements View.OnClickListener, V
     private void undo() {
         String content = contentLine.getText().toString();
         int length = contentLine.getText().length();
-        if(isisInput && !stopCharHandler.findInList(content, length - 1))
+        if(isisInput)
             contentStack.put(content, length);
         isInput = false;
         Map<String, Object> map = contentStack.undo();
@@ -420,8 +428,12 @@ public class ContentActivity extends Activity implements View.OnClickListener, V
 
         contentLine.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
+            public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
+                if(count > after && isInput) {
+                    int cursor = start + count;
+                    if (stopCharHandler.findInList(charSequence.toString().substring(start, cursor)))
+                        contentStack.put(charSequence.toString(), cursor);
+                }
             }
 
             @Override
@@ -434,13 +446,16 @@ public class ContentActivity extends Activity implements View.OnClickListener, V
                     setButtonEnabled(undoButton, true);
                     setButtonEnabled(redoButton, false);
 
-                    int cursor = start + count;
-                    if(stopCharHandler.findInList(charSequence.toString(), cursor == 0 ? 0 : cursor - 1))
-                        contentStack.put(charSequence.toString(), cursor);
+                    if(count > before) {
+                        int cursor = start + count;
+                        if (stopCharHandler.findInList(charSequence.toString().substring(start, cursor)))
+                            contentStack.put(charSequence.toString(), cursor);
+                    }
                 }
 
                 if(mdSwitch.isChecked())
-                    new MdASyncTask(markdownView, loadProgressBar).execute(contentLine.getText().toString());
+                    new MdASyncTask(markdownView, loadProgressBar, configHandler.getValue("showBorder") == 1)
+                            .execute(contentLine.getText().toString());
             }
 
             @Override
@@ -454,13 +469,16 @@ public class ContentActivity extends Activity implements View.OnClickListener, V
     @Override
     public void onFocusChange(View view, boolean isFocused) {
         if(isFocused) {
+            setButtonEnabled(photoButton, true);
             setButtonEnabled(boldButton, true);
             setButtonEnabled(italicButton, true);
             setButtonEnabled(ulButton, true);
             setButtonEnabled(olButton, true);
             setButtonEnabled(deletelineButton, true);
         }
+
         else {
+            setButtonEnabled(photoButton, false);
             setButtonEnabled(boldButton, false);
             setButtonEnabled(italicButton, false);
             setButtonEnabled(ulButton, false);

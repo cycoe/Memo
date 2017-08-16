@@ -42,6 +42,7 @@
         android:layout_height="50dp"
         android:layout_gravity="bottom"
         android:background="?android:attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/addNew"
         android:src="@mipmap/add" />
 
 </FrameLayout>

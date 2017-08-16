@@ -1,0 +1,10 @@
+[
+    {
+        "merged": "/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/res/merged/release/raw/about",
+        "source": "/home/cycoe/AndroidStudioProjects/Memo/app/src/main/res/raw/about"
+    },
+    {
+        "merged": "/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/res/merged/release/raw/license",
+        "source": "/home/cycoe/AndroidStudioProjects/Memo/app/src/main/res/raw/license"
+    }
+]

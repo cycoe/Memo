@@ -30,10 +30,11 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:fillViewport="true"
-                    android:layout_margin="5dp" >
+                    android:layout_margin="@dimen/editlineMargin" >
 
                     <EditText
                         android:id="@+id/markdownView"
+                        android:labelFor="@+id/markdownView"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="@null"
@@ -58,7 +59,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:fillViewport="true"
-                android:layout_margin="10dp"
+                android:layout_margin="@dimen/editlineMargin"
                 android:layout_weight="1" >
 
                 <EditText
@@ -77,6 +78,6 @@
 
     </LinearLayout>
 
-    <include layout="@layout/toolbar_bottom"/>
+    <include layout="@layout/toolbar_bottom" />
 
 </FrameLayout>

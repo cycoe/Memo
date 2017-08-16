@@ -1,5 +1,6 @@
 package win.cycoe.memo.Handler;
 
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.view.View;
 import android.widget.ProgressBar;
@@ -18,10 +19,12 @@ public class MdASyncTask extends AsyncTask<String, Void, RichTextConfig.RichText
 
     private TextView markdownView;
     private ProgressBar loadProgressBar;
+    private boolean showBorder;
 
-    public MdASyncTask(TextView markdownView, ProgressBar loadProgressBar) {
+    public MdASyncTask(TextView markdownView, ProgressBar loadProgressBar, boolean showBorder) {
         this.markdownView = markdownView;
         this.loadProgressBar = loadProgressBar;
+        this.showBorder = showBorder;
     }
 
     @Override
@@ -33,7 +36,9 @@ public class MdASyncTask extends AsyncTask<String, Void, RichTextConfig.RichText
     @Override
     protected RichTextConfig.RichTextConfigBuild doInBackground(String... strings) {
         RichText.initCacheDir(new File("/storage/emulated/0/Memo/"));
-        return RichText.fromMarkdown(strings[0]);
+        return RichText.fromMarkdown(strings[0])
+                .showBorder(showBorder)
+                .borderColor(Color.RED);
     }
 
     @Override

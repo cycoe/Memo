@@ -1,6 +1,7 @@
 package win.cycoe.memo;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
@@ -61,10 +62,11 @@ public class SettingActivity extends Activity implements AdapterView.OnItemClick
 
         otherBeanList = new ArrayList<>();
         otherBeanList.add(new SettingBean("开源协议", "The MIT License", -1));
-//        otherBeanList.add(new SettingBean("关于", "", -1));
+        otherBeanList.add(new SettingBean("关于", "", -1));
         
         editorBeanList = new ArrayList<>();
         editorBeanList.add(new SettingBean("Markdown 全屏预览", "开启将启用 MarkDown 的全屏预览模式\n关闭将使用半屏预览", configHandler.getValue("fullScreen")));
+        editorBeanList.add(new SettingBean("显示图片边框", "", configHandler.getValue("showBorder")));
 
         builer = new DialogBuiler(this);
     }
@@ -77,13 +79,15 @@ public class SettingActivity extends Activity implements AdapterView.OnItemClick
         
         listViewEditor = (ListView) findViewById(R.id.listViewEditor);
         editAdapter = new SettingAdapter(this, editorBeanList);
-        editAdapter.initData(new boolean[] {(configHandler.getValue("fullScreen") == 1)});
+        editAdapter.initData(new boolean[] {(configHandler.getValue("fullScreen") == 1),
+                                                configHandler.getValue("showBorder") == 1});
         listViewEditor.setAdapter(editAdapter);
         listViewEditor.setOnItemClickListener(this);
     }
 
     private void initToolbar() {
         settingToolbar = (Toolbar) findViewById(R.id.settingToolbar);
+        settingToolbar.setTitle(R.string.setting);
         settingToolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -95,6 +99,7 @@ public class SettingActivity extends Activity implements AdapterView.OnItemClick
     private void setBack() {
         HashMap<Integer, Boolean> isSelectedEdit = editAdapter.getIsSelected();
         configHandler.createKV("fullScreen", isSelectedEdit.get(0) ? 1 : 0);
+        configHandler.createKV("showBorder", isSelectedEdit.get(1) ? 1 : 0);
         finish();
     }
 
@@ -122,6 +127,8 @@ public class SettingActivity extends Activity implements AdapterView.OnItemClick
                     case 0:
                         openLicense();
                         break;
+                    case 1:
+                        openAbout();
                 }
                 break;
             case R.id.listViewEditor:
@@ -131,5 +138,10 @@ public class SettingActivity extends Activity implements AdapterView.OnItemClick
                 }
                 break;
         }
+    }
+
+    private void openAbout() {
+        Intent intent = new Intent(this, AboutActivity.class);
+        startActivity(intent);
     }
 }

@@ -1,0 +1,11 @@
+Memo 是我开发的第一款安卓应用，我也是刚开始学习 Android 开发，很多做的不完善的地方请见谅。等不断学习到新技巧后来一步一步地优化。
+
+Memo 是一款主打 Markdown 编辑功能的记事软件，支持常用的 Markdown 标签以及撤销重做功能。未来还计划支持云同步来保存珍贵的记忆。
+
+Memo 中的 Markdown 解析器原先使用的是 zzhoujay 在 GitHub 上开源的 Markdown 项目，后由于需要图片解析功能将解析器替换为 zzhoujay 的 RichText 项目，非常感谢 zzhoujay 的开源。
+
+Memo 开源地址：https://github.com/cycoe/Memo
+
+Markdown 开源地址：https://github.com/zzhoujay/Markdown
+
+RichText 开源地址：https://github.com/zzhoujay/RichText

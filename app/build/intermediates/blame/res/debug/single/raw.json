@@ -2,5 +2,9 @@
     {
         "merged": "/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/res/merged/debug/raw/license",
         "source": "/home/cycoe/AndroidStudioProjects/Memo/app/src/main/res/raw/license"
+    },
+    {
+        "merged": "/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/res/merged/debug/raw/about",
+        "source": "/home/cycoe/AndroidStudioProjects/Memo/app/src/main/res/raw/about"
     }
 ]

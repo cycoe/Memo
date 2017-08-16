@@ -72,8 +72,10 @@ public class SettingAdapter extends BaseAdapter {
         viewHolder.settingTitle.setText(settingBean.settingTitle);
         if(settingBean.settingContent.isEmpty())
             viewHolder.settingContent.setVisibility(View.GONE);
-        else
+        else {
+            viewHolder.settingContent.setVisibility(View.VISIBLE);
             viewHolder.settingContent.setText(settingBean.settingContent);
+        }
         viewHolder.settingCheck.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

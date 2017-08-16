@@ -1,96 +1,107 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<HorizontalScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="50dp"
     android:layout_gravity="bottom"
     android:orientation="horizontal"
+    android:scrollbars="none"
     android:fillViewport="true"
     android:background="@color/colorHearder" >
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
         android:gravity="center_vertical|start"
         android:orientation="horizontal" >
 
         <ImageButton
             android:id="@+id/undoButton"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginStart="20dp"
+            android:layout_width="@dimen/imageButtonSize"
+            android:layout_height="@dimen/imageButtonSize"
+            android:scaleType="fitXY"
+            android:layout_marginStart="@dimen/imageButtonMargin"
             android:background="?android:attr/selectableItemBackgroundBorderless"
             android:src="@mipmap/undo" />
 
         <ImageButton
             android:id="@+id/redoButton"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginStart="20dp"
+            android:layout_width="@dimen/imageButtonSize"
+            android:layout_height="@dimen/imageButtonSize"
+            android:scaleType="fitXY"
+            android:layout_marginStart="@dimen/imageButtonMargin"
             android:background="?android:attr/selectableItemBackgroundBorderless"
             android:src="@mipmap/redo" />
 
         <ImageButton
-            android:id="@+id/photoButton"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginStart="20dp"
-            android:background="?android:attr/selectableItemBackgroundBorderless"
-            android:src="@mipmap/photo" />
-
-        <ImageButton
             android:id="@+id/delButton"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginStart="20dp"
+            android:layout_width="@dimen/imageButtonSize"
+            android:layout_height="@dimen/imageButtonSize"
+            android:scaleType="fitXY"
+            android:layout_marginStart="@dimen/imageButtonMargin"
             android:background="?android:attr/selectableItemBackgroundBorderless"
             android:src="@mipmap/del" />
 
         <ImageButton
+            android:id="@+id/photoButton"
+            android:layout_width="@dimen/imageButtonSize"
+            android:layout_height="@dimen/imageButtonSize"
+            android:scaleType="fitXY"
+            android:layout_marginStart="@dimen/imageButtonMargin"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:src="@mipmap/photo" />
+
+        <ImageButton
             android:id="@+id/boldButton"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginStart="20dp"
+            android:layout_width="@dimen/imageButtonSize"
+            android:layout_height="@dimen/imageButtonSize"
+            android:scaleType="fitXY"
+            android:layout_marginStart="@dimen/imageButtonMargin"
             android:background="?android:attr/selectableItemBackgroundBorderless"
             android:src="@mipmap/bold" />
 
         <ImageButton
             android:id="@+id/italicButton"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginStart="20dp"
+            android:layout_width="@dimen/imageButtonSize"
+            android:layout_height="@dimen/imageButtonSize"
+            android:scaleType="fitXY"
+            android:layout_marginStart="@dimen/imageButtonMargin"
             android:background="?android:attr/selectableItemBackgroundBorderless"
             android:src="@mipmap/italic" />
 
         <ImageButton
+            android:id="@+id/deletelineButton"
+            android:layout_width="@dimen/imageButtonSize"
+            android:layout_height="@dimen/imageButtonSize"
+            android:scaleType="fitXY"
+            android:layout_marginStart="@dimen/imageButtonMargin"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:src="@mipmap/deleteline" />
+
+        <ImageButton
             android:id="@+id/ulButton"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginStart="20dp"
+            android:layout_width="@dimen/imageButtonSize"
+            android:layout_height="@dimen/imageButtonSize"
+            android:scaleType="fitXY"
+            android:layout_marginStart="@dimen/imageButtonMargin"
             android:background="?android:attr/selectableItemBackgroundBorderless"
             android:src="@mipmap/ul" />
 
         <ImageButton
             android:id="@+id/olButton"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginStart="20dp"
+            android:layout_width="@dimen/imageButtonSize"
+            android:layout_height="@dimen/imageButtonSize"
+            android:scaleType="fitXY"
+            android:layout_marginStart="@dimen/imageButtonMargin"
+            android:layout_marginEnd="@dimen/imageButtonMargin"
             android:background="?android:attr/selectableItemBackgroundBorderless"
             android:src="@mipmap/ol" />
-
-        <ImageButton
-            android:id="@+id/deletelineButton"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginStart="20dp"
-            android:background="?android:attr/selectableItemBackgroundBorderless"
-            android:src="@mipmap/deleteline" />
 
         <!--<SeekBar-->
             <!--android:id="@+id/sizeChanger"-->
             <!--android:layout_height="wrap_content"-->
             <!--android:layout_width="match_parent"-->
-            <!--android:layout_marginLeft="20dp" />-->
+            <!--android:layout_marginLeft="@dimen/imageButtonMargin" />-->
 
     </LinearLayout>
 
-</ScrollView>
+</HorizontalScrollView>

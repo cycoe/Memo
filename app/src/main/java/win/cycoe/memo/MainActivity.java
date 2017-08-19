@@ -2,19 +2,24 @@ package win.cycoe.memo;
 
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.widget.SearchView;
 import android.text.InputFilter;
 import android.text.InputType;
 import android.text.Spanned;
 import android.view.ContextMenu;
+import android.view.ContextThemeWrapper;
 import android.view.View;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -25,31 +30,34 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
+import win.cycoe.memo.Handler.ConfigHandler;
 import win.cycoe.memo.Handler.DatabaseHandler;
+import win.cycoe.memo.Handler.DateParser;
 import win.cycoe.memo.Handler.Finder;
 
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener, View.OnClickListener {
 
-    private final String[] HEADERLIST = {"title", "content", "date"};
+    private final String[] permissions = {android.Manifest.permission.WRITE_EXTERNAL_STORAGE};
 
     private ListView listView;
     private ListView tableView;
     private EditText tableNameInput;
     private ImageButton newTableButton;
-    private SimpleAdapter simpleAdapter;
+    private SearchView searchView;
+
+    private MainAdapter mainAdapter;
     private Intent intent;
     private SQLiteDatabase db;
     private DatabaseHandler dbHandler;
     private DialogBuiler builer;
     private Finder finder;
+    private DateParser dateParser;
+    private InputFilter filter;
 
     private DialogInterface.OnClickListener clickListenerNewTab;
     private DialogInterface.OnClickListener clickListenerRenameTab;
@@ -57,16 +65,19 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private DialogInterface.OnClickListener clickListenerNothing;
 
     private ArrayAdapter<String> arrayAdapter;
-    private List<Map<String, Object>> listViewData;
+    private List<MainBean> mainBeanList;
     private List<String> tableViewData;
-    private int currentPos = 0;
-    private int position;
+    private int currentTable = 0;
+    private int selectTable;
 
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        SharedPreferences pref = getSharedPreferences("config", MODE_PRIVATE);
+        ConfigHandler configHandler = new ConfigHandler(pref);
+        setTheme(configHandler.getValue("darkTheme") == 1 ? R.style.AppTheme_dark : R.style.AppTheme);
         setContentView(R.layout.drawer_layout);
 
         initData();
@@ -98,6 +109,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         intent = new Intent(this, ContentActivity.class);
         builer = new DialogBuiler(this);
         finder = new Finder();
+        dateParser = new DateParser();
+        // request storage permission
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+            requestPermissions(permissions, 321);
     }
 
     private void initDialogListener() {
@@ -129,9 +144,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     if(finder.findInList(dbHandler.tbList, tableNameInput.getText().toString()))
                         Snackbar.make(tableView, "该分类已存在", Snackbar.LENGTH_SHORT).show();
                     else {
-                        dbHandler.renameTable(tableNameInput.getText().toString(), position);
+                        dbHandler.renameTable(tableNameInput.getText().toString(), selectTable);
                         refreshTableView();
-                        setTitle(dbHandler.tbList[position]);
+                        setTitle(dbHandler.tbList[selectTable]);
                     }
                 }
                 else
@@ -141,14 +156,14 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         clickListenerDelTab = new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                dbHandler.deleteTable(position);
+                dbHandler.deleteTable(selectTable);
                 refreshTableView();
-                if(currentPos == position) {
-                    currentPos = 0;
-                    dbHandler.handle(dbHandler.tbList[currentPos]);
+                if(currentTable == selectTable) {
+                    currentTable = 0;
+                    dbHandler.handle(dbHandler.tbList[currentTable]);
                     refreshListView();
-                    tableView.setItemChecked(currentPos, true);
-                    setTitle(dbHandler.tbList[currentPos]);
+                    tableView.setItemChecked(currentTable, true);
+                    setTitle(dbHandler.tbList[currentTable]);
                     DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
                     if (drawer.isDrawerOpen(GravityCompat.START)) {
                         drawer.closeDrawer(GravityCompat.START);
@@ -162,8 +177,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         listView = (ListView) findViewById(R.id.listView);
         tableView = (ListView) findViewById(R.id.tableView);
         newTableButton = (ImageButton) findViewById(R.id.newTabButton);
-        tableNameInput = new EditText(this);
-        InputFilter filter = new InputFilter() {
+        filter = new InputFilter() {
             @Override
             public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
                 if(source.equals(" "))
@@ -172,8 +186,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     return null;
             }
         };
-        tableNameInput.setFilters(new InputFilter[] {filter});
-        tableNameInput.setInputType(InputType.TYPE_CLASS_TEXT);
 
         newTableButton.setOnClickListener(this);
     }
@@ -208,40 +220,35 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         toggle.syncState();
     }
 
+    /**
+     * SimpleAdapter(context, data, resource, from, to)
+     * context : 上下文对象
+     * data : 特定的泛型的集合，map 组成的 list 集合，每个 map 中的键必须包含 from 中指定的键
+     * resource ： 列表项的布局文件 ID
+     * from ： 记录 map 中的键名
+     * to ： 绑定数据视图中的 ID，与 from 的对应关系
+     */
     private void fillListView() {
-        listViewData = new ArrayList<>();
-        simpleAdapter = new SimpleAdapter(this,
-                getListViewData(),
-                R.layout.listitem_layout,
-                HEADERLIST,
-                new int[] {R.id.title, R.id.content, R.id.date});
-        /**
-         * SimpleAdapter(context, data, resource, from, to)
-         * context : 上下文对象
-         * data : 特定的泛型的集合，map 组成的 list 集合，每个 map 中的键必须包含 from 中指定的键
-         * resource ： 列表项的布局文件 ID
-         * from ： 记录 map 中的键名
-         * to ： 绑定数据视图中的 ID，与 from 的对应关系
-         */
-
-        listView.setAdapter(simpleAdapter);
+        mainBeanList = new ArrayList<>();
+        mainAdapter = new MainAdapter(this, getListViewData());
+        listView.setAdapter(mainAdapter);
         listView.setOnItemClickListener(this);
-        setTitle(dbHandler.tbList[currentPos]);
+        setTitle(dbHandler.tbList[currentTable]);
     }
 
     private void fillTableView() {
         tableViewData = new ArrayList<>();
-        arrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_single_choice, getTableViewData());
+        arrayAdapter = new ArrayAdapter<>(this, R.layout.simple_list_item_single_choice, getTableViewData());
         tableView.setAdapter(arrayAdapter);
         tableView.setOnItemClickListener(this);
-        tableView.setItemChecked(currentPos, true);
+        tableView.setItemChecked(currentTable, true);
     }
 
     private void refreshListView() {
         dbHandler.readDatabase();
-        listViewData.removeAll(listViewData);
+        mainBeanList.removeAll(mainBeanList);
         getListViewData();
-        simpleAdapter.notifyDataSetChanged();
+        mainAdapter.notifyDataSetChanged();
     }
 
     private void refreshTableView() {
@@ -251,14 +258,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         arrayAdapter.notifyDataSetChanged();
     }
 
-    private List<Map<String, Object>> getListViewData() {
-        for(int i = 0; i < dbHandler.contentList.length; i++) {
-            Map<String, Object>map = new HashMap<String, Object>();
-            for(int j = 0; j < HEADERLIST.length; j++)
-                map.put(HEADERLIST[j], dbHandler.contentList[i][j]);
-            listViewData.add(map);
-        }
-        return listViewData;
+    private List<MainBean> getListViewData() {
+        for(int i = 0; i < dbHandler.contentList.length; i++)
+            mainBeanList.add(new MainBean(dbHandler.contentList[i][0],
+                    dbHandler.contentList[i][1],
+                    dateParser.getRelativeTime(dbHandler.contentList[i][2])));
+        return mainBeanList;
     }
 
     private List<String> getTableViewData() {
@@ -274,24 +279,54 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         if(dbHandler.tbList.length == 0)
             dbHandler.createTable("默认");
         dbHandler.readTables();
-        dbHandler.handle(dbHandler.tbList[currentPos]);
+        dbHandler.handle(dbHandler.tbList[currentTable]);
         dbHandler.readDatabase();
     }
 
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
+        if (drawer.isDrawerOpen(GravityCompat.START))
             drawer.closeDrawer(GravityCompat.START);
-        } else {
+        else if(!searchView.isIconified())
+            searchView.setIconified(true);
+        else
             super.onBackPressed();
-        }
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
+
+        searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
+//        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+//        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                mainBeanList.removeAll(mainBeanList);
+
+                for(int i = 0; i < dbHandler.contentList.length; i++) {
+                    if(finder.findAllInString(dbHandler.contentList[i][0], newText.split(" "))
+                            || finder.findAllInString(dbHandler.contentList[i][1], newText.split(" "))
+                            || finder.findAllInString(dateParser.getRelativeTime(dbHandler.contentList[i][2]), newText.split(" ")))
+                        mainBeanList.add(new MainBean(dbHandler.contentList[i][0],
+                                dbHandler.contentList[i][1],
+                                dateParser.getRelativeTime(dbHandler.contentList[i][2])));
+                }
+
+                mainAdapter.notifyDataSetChanged();
+                return true;
+            }
+        });
+
         return true;
     }
 
@@ -305,7 +340,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             Intent intent = new Intent(MainActivity.this, SettingActivity.class);
-            startActivity(intent);
+            startActivityForResult(intent, 0);
             return true;
         }
 
@@ -327,7 +362,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 if (drawer.isDrawerOpen(GravityCompat.START)) {
                     drawer.closeDrawer(GravityCompat.START);
                 }
-                currentPos = position;
+                currentTable = position;
                 break;
         }
     }
@@ -377,19 +412,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     private void tableViewContentClick(int itemId, final int position) {
-        this.position = position;
+        this.selectTable = position;
         switch (itemId) {
             case 0:
                 tableNameInput = new EditText(this);
-                InputFilter filter = new InputFilter() {
-                    @Override
-                    public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
-                        if(source.equals(" "))
-                            return "";
-                        else
-                            return null;
-                    }
-                };
                 tableNameInput.setFilters(new InputFilter[] {filter});
                 tableNameInput.setInputType(InputType.TYPE_CLASS_TEXT);
                 tableNameInput.setHint(dbHandler.tbList[position]);
@@ -421,15 +447,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         switch (view.getId()) {
             case R.id.newTabButton:
                 tableNameInput = new EditText(this);
-                InputFilter filter = new InputFilter() {
-                    @Override
-                    public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
-                        if(source.equals(" "))
-                            return "";
-                        else
-                            return null;
-                    }
-                };
                 tableNameInput.setFilters(new InputFilter[] {filter});
                 tableNameInput.setInputType(InputType.TYPE_CLASS_TEXT);
                 builer.createDialog("提示", "输入新建分类名称", clickListenerNewTab, clickListenerNothing, tableNameInput);

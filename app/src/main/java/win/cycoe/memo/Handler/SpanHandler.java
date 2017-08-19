@@ -10,11 +10,11 @@ import android.widget.EditText;
 public class SpanHandler {
 
     private final String[][] SPANLIST = {
-            {"**", "**"},
-            {"*", "*"},
-            {"\n- ", ""},
-            {"\n1. ", ""},
-            {"~~", "~~"},
+            {"", "**", "**"},
+            {"", "*", "*"},
+            {"\n", "- ", ""},
+            {"\n", "1. ", ""},
+            {"", "~~", "~~"},
     };
 
     private EditText contentLine;
@@ -28,62 +28,51 @@ public class SpanHandler {
     }
 
     public void insertSpan(int flag) {
-        this.contentEditable = contentLine.getText();
-        this.content = contentEditable.toString();
+        contentEditable = contentLine.getText();
+        content = contentEditable.toString();
         start = contentLine.getSelectionStart();
         end = contentLine.getSelectionEnd();
-        int lengthBefore = getStringBefore(flag);
-        int lengthAfter = getStringAfter(flag);
 
-        contentEditable.replace(start - lengthBefore, start, SPANLIST[flag][0]);
-        contentEditable.replace(end + SPANLIST[flag][0].length() - lengthBefore,
-                end + SPANLIST[flag][0].length() - lengthBefore + lengthAfter,
-                SPANLIST[flag][1]);
-        contentLine.setSelection(start + SPANLIST[flag][0].length() - lengthBefore,
-                end + SPANLIST[flag][0].length() - lengthBefore);
+        int lengthBefore = getStringBefore(SPANLIST[flag][0]);
+        int insertBeforeLen;
+        if(start != lengthBefore) {
+            contentEditable.replace(start - lengthBefore, start, SPANLIST[flag][0]);
+            insertBeforeLen = SPANLIST[flag][0].length() - lengthBefore;
+        }
+        else
+            insertBeforeLen = 0;
+        contentEditable.insert(start + insertBeforeLen, SPANLIST[flag][1]);
+        contentEditable.insert(end + insertBeforeLen + SPANLIST[flag][1].length(), SPANLIST[flag][2]);
+        contentLine.setSelection(start + insertBeforeLen + SPANLIST[flag][1].length(),
+                end + insertBeforeLen + SPANLIST[flag][1].length());
     }
 
     public void insertUrl(String url) {
-        this.contentEditable = contentLine.getText();
-        this.content = contentEditable.toString();
+        contentEditable = contentLine.getText();
+        content = contentEditable.toString();
         start = contentLine.getSelectionStart();
         end = contentLine.getSelectionEnd();
-        int lengthBefore = getStringBefore();
-
         contentEditable.replace(start, end, url);
-        contentEditable.replace(start - lengthBefore, start, "\n\n");
-        contentLine.setSelection(start + 2 - lengthBefore, start + 2 - lengthBefore + url.length());
+
+        int lengthBefore = getStringBefore("\n\n");
+        int insertBeforeLen;
+        if(start != lengthBefore) {
+            contentEditable.replace(start - lengthBefore, start, "\n\n");
+            insertBeforeLen = 2 - lengthBefore;
+        }
+        else
+            insertBeforeLen = 0;
+        contentLine.setSelection(start + insertBeforeLen, start + insertBeforeLen + url.length());
 
     }
 
-    private int getStringBefore() {
-        String subString = content.substring(start > 2 ? start - 2 : 0 , start);
+    private int getStringBefore(String stringBefore) {
+        String subString = content.substring(start > stringBefore.length() ? start - stringBefore.length() : 0 , start);
         for(int i = subString.length(); i > 0; i--) {
-            if("\n\n".contains(subString))
+            if(stringBefore.contains(subString))
                 return i;
             subString = subString.substring(1);
         }
         return 0;
     }
-
-    private int getStringBefore(int flag) {
-        String subString = content.substring(start > SPANLIST[flag][0].length() ? start - SPANLIST[flag][0].length() : 0 , start);
-        for(int i = subString.length(); i > 0; i--) {
-            if(SPANLIST[flag][0].contains(subString))
-                return i;
-            subString = subString.substring(1);
-        }
-        return 0;
-    }
-
-    private int getStringAfter(int flag) {
-        String subString = content.substring(end, end + SPANLIST[flag][1].length() < content.length() ? end + SPANLIST[flag][1].length() : content.length());
-        for(int i = subString.length(); i > 0; i--) {
-            if(SPANLIST[flag][1].contains(subString))
-                return i;
-            subString = subString.substring(0, subString.length() - 1);
-        }
-        return 0;
-    }
-
 }

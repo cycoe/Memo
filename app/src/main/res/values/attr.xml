@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr name="groupTextColor" format="reference" />
+    <attr name="primaryTextColor" format="reference" />
+    <attr name="secondaryTextColor" format="reference" />
+    <attr name="tertiaryTextColor" format="reference" />
+</resources>

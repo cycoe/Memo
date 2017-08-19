@@ -8,7 +8,6 @@ import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.TextView;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -70,19 +69,12 @@ public class SettingAdapter extends BaseAdapter {
 
         SettingBean settingBean = settingBeanList.get(position);
         viewHolder.settingTitle.setText(settingBean.settingTitle);
-        if(settingBean.settingContent.isEmpty())
-            viewHolder.settingContent.setVisibility(View.GONE);
-        else {
-            viewHolder.settingContent.setVisibility(View.VISIBLE);
-            viewHolder.settingContent.setText(settingBean.settingContent);
-        }
+        viewHolder.settingContent.setText(settingBean.settingContent);
+        viewHolder.settingContent.setVisibility(settingBean.settingContent.isEmpty() ? View.GONE : View.VISIBLE);
         viewHolder.settingCheck.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(isSelected.get(position))
-                    isSelected.put(position, false);
-                else
-                    isSelected.put(position, true);
+                isSelected.put(position, !isSelected.get(position));
             }
         });
 

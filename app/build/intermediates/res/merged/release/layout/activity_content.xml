@@ -10,7 +10,7 @@
         android:layout_height="match_parent"
         android:layout_marginBottom="50dp" >
 
-        <include layout="@layout/toolbar_header"/>
+        <include layout="@layout/content_header"/>
 
         <LinearLayout
             android:orientation="vertical"
@@ -41,7 +41,8 @@
                         android:editable="false"
                         android:gravity="top"
                         android:textIsSelectable="true"
-                        android:textSize="15sp" />
+                        android:textSize="15sp"
+                        android:textColor="?attr/primaryTextColor" />
 
                 </ScrollView>
 
@@ -68,6 +69,7 @@
                     android:layout_width="match_parent"
                     android:gravity="start"
                     android:textSize="15sp"
+                    android:textColor="?attr/primaryTextColor"
                     android:inputType="textMultiLine"
                     android:background="@null"
                     android:hint="@string/content" />
@@ -78,6 +80,6 @@
 
     </LinearLayout>
 
-    <include layout="@layout/toolbar_bottom" />
+    <include layout="@layout/content_bottom" />
 
 </FrameLayout>

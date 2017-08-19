@@ -1,6 +1,7 @@
 package win.cycoe.memo;
 
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.method.LinkMovementMethod;
 import android.view.View;
@@ -11,6 +12,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+
+import win.cycoe.memo.Handler.ConfigHandler;
 
 /**
  * Created by cycoe on 17-8-16.
@@ -26,6 +29,9 @@ public class AboutActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        SharedPreferences pref = getSharedPreferences("config", MODE_PRIVATE);
+        ConfigHandler configHandler = new ConfigHandler(pref);
+        setTheme(configHandler.getValue("darkTheme") == 1 ? R.style.AppTheme_dark : R.style.AppTheme);
         setContentView(R.layout.activity_about);
 
         setToolbar();

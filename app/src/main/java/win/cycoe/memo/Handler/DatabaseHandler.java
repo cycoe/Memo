@@ -3,7 +3,12 @@ package win.cycoe.memo.Handler;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Environment;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,6 +28,8 @@ public class DatabaseHandler {
     private String tb;
 
     private SQLiteDatabase db;
+
+    public DatabaseHandler() {}
 
     public DatabaseHandler(SQLiteDatabase database) {
         db = database;
@@ -93,5 +100,32 @@ public class DatabaseHandler {
 
     public void renameTable(String newTableName, int position) {
         db.execSQL("ALTER TABLE " + tbList[position] + " RENAME TO " + newTableName);
+    }
+
+    public boolean exportDb(boolean direction) {
+        try {
+            int bytesum = 0;
+            int byteread = 0;
+            String INTERPATH = Environment.getDataDirectory().toString() + "/data/win.cycoe.memo/databases/memo.db";
+            String OUTERPATH = Environment.getExternalStorageDirectory().toString() + "/Memo/memo.db";
+            File backupDir = new File(Environment.getExternalStorageDirectory().toString() + "/Memo");
+            if (!backupDir.exists())
+                backupDir.mkdir();
+            InputStream inStream = new FileInputStream(direction ? INTERPATH : OUTERPATH);
+            FileOutputStream outStream = new FileOutputStream(direction ? OUTERPATH : INTERPATH);
+            byte[] buffer = new byte[1024];
+            while ((byteread = inStream.read(buffer)) != -1) {
+                bytesum += byteread;
+                outStream.write(buffer, 0, byteread);
+            }
+            inStream.close();
+            outStream.flush();
+            outStream.close();
+            return true;
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 }

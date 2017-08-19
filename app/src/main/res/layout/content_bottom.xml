@@ -6,7 +6,7 @@
     android:orientation="horizontal"
     android:scrollbars="none"
     android:fillViewport="true"
-    android:background="@color/colorHearder" >
+    android:background="?attr/colorPrimary" >
 
     <LinearLayout
         android:layout_width="wrap_content"

@@ -1,7 +1,6 @@
 package win.cycoe.memo;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -10,7 +9,8 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
@@ -22,12 +22,11 @@ import android.widget.Toolbar;
 
 import com.zzhoujay.richtext.RichText;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Map;
 
 import win.cycoe.memo.Handler.ConfigHandler;
 import win.cycoe.memo.Handler.ContentStack;
+import win.cycoe.memo.Handler.DateParser;
 import win.cycoe.memo.Handler.MdASyncTask;
 import win.cycoe.memo.Handler.SpanHandler;
 import win.cycoe.memo.Handler.StopCharHandler;
@@ -44,13 +43,6 @@ public class ContentActivity extends Activity implements View.OnClickListener, V
     private final int UNMODIFIED = 0;
     private final int MODIFIED = 1;
     private final int DELETE = 2;
-//    private final String[][] SPANLIST = {
-//            {"**", "**"},
-//            {"*", "*"},
-//            {"- ", ""},
-//            {"1. ", ""},
-//            {"~~", "~~"},
-//    };
 
     private Toolbar itemToolbar;
     private ImageButton undoButton;
@@ -77,6 +69,7 @@ public class ContentActivity extends Activity implements View.OnClickListener, V
     private SharedPreferences pref;
     private ConfigHandler configHandler;
     private SpanHandler spanHandler;
+    private DateParser dateParser;
 
     private DialogInterface.OnClickListener clickListenerSave;
     private DialogInterface.OnClickListener clickListenerDel;
@@ -88,10 +81,12 @@ public class ContentActivity extends Activity implements View.OnClickListener, V
     private boolean isisInput = true;
     private boolean isModified = false;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        SharedPreferences pref = getSharedPreferences("config", MODE_PRIVATE);
+        ConfigHandler configHandler = new ConfigHandler(pref);
+        setTheme(configHandler.getValue("darkTheme") == 1 ? R.style.AppTheme_dark : R.style.AppTheme);
         setContentView(R.layout.activity_content);
 
         initView();
@@ -218,6 +213,7 @@ public class ContentActivity extends Activity implements View.OnClickListener, V
 
         stopCharHandler = new StopCharHandler();
         spanHandler = new SpanHandler(contentLine);
+        dateParser = new DateParser();
 
         builer = new DialogBuiler(this);
 
@@ -242,20 +238,18 @@ public class ContentActivity extends Activity implements View.OnClickListener, V
             dateView.setVisibility(View.VISIBLE);
     }
 
-    private String getNowTime() {
-        /**
-         * 1. instantiate a dateFormat object with the pattern of "yyyy-MM-dd HH:mm:ss"
-         * 2. return the formated date string
-         */
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        return dateFormat.format(new Date());
-    }
-
     private void switchMdView() {
+        Animation fadeShow = AnimationUtils.loadAnimation(this, R.anim.fadeshow);
+        Animation fadeHide = AnimationUtils.loadAnimation(this, R.anim.fadehide);
+
+        mdLayoutView.startAnimation(mdSwitch.isChecked() ? fadeShow : fadeHide);
         mdLayoutView.setVisibility(mdSwitch.isChecked() ? View.VISIBLE : View.GONE);
         if(configHandler.getValue("fullScreen") == 1) {
+            contentView.startAnimation(mdSwitch.isChecked() ? fadeHide : fadeShow);
             contentView.setVisibility(mdSwitch.isChecked() ? View.GONE : View.VISIBLE);
-        }
+        } else
+            contentView.startAnimation(fadeShow);
+
         if(mdSwitch.isChecked())
             new MdASyncTask(markdownView, loadProgressBar, configHandler.getValue("showBorder") == 1)
                     .execute(contentLine.getText().toString());
@@ -263,39 +257,28 @@ public class ContentActivity extends Activity implements View.OnClickListener, V
             contentLine.requestFocus();
     }
 
-//    private void insertSpan(int flag) {
-//        int start = contentLine.getSelectionStart();
-//        int end = contentLine.getSelectionEnd();
-//        contentLine.getText().insert(start, SPANLIST[flag][0]);
-//        contentLine.getText().insert(end+SPANLIST[flag][0].length(), SPANLIST[flag][1]);
-//        contentLine.setSelection(start+SPANLIST[flag][0].length(), end+SPANLIST[flag][0].length());
-//    }
-
     private void setToolbar() {
         /**
          * 1. inflateMenu(res/menu/menu.xml): set the flate menu items
          * 2. setNavigationOnClickListener()
          */
 
-//        itemToolbar.inflateMenu(R.menu.toolbar_menu);
         itemToolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(isModified)
+                if(titleLine.getText().toString().trim().isEmpty()
+                        && contentLine.getText().toString().trim().isEmpty()) {
+                    if (!content[2].isEmpty())
+                        setBack(false, DELETE);
+                    else
+                        setBack(false, UNMODIFIED);
+                }
+                else if(isModified)
                     setBack(true, MODIFIED);
                 else
                     setBack(false, UNMODIFIED);
             }
         });
-//        itemToolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-//
-//            @Override
-//            public boolean onMenuItemClick(MenuItem menuItem) {
-//                if(menuItem.getItemId() == R.id.backButton)
-//                    setBackWithConfirm();
-//                return true;
-//            }
-//        });
     }
 
     private void setButtonEnabled(View view, boolean flag) {
@@ -363,7 +346,7 @@ public class ContentActivity extends Activity implements View.OnClickListener, V
         if(resultCode == RESULT_OK) {
             Uri uri = data.getData();
             UriToPathUtil uriToPathUtil = new UriToPathUtil();
-            String path = uriToPathUtil.getImageAbsolutePath(this, uri);
+            String path = uriToPathUtil.getRealFilePath(this, uri);
             String fullPath = "![img](" + path + ")";
 
             spanHandler.insertUrl(fullPath);
@@ -375,7 +358,7 @@ public class ContentActivity extends Activity implements View.OnClickListener, V
     private void saveContent() {
         content[0] = titleLine.getText().toString();
         content[1] = contentLine.getText().toString();
-        content[2] = getNowTime();
+        content[2] = dateParser.getCurrentTime();
     }
 
     private void undo() {

@@ -8,6 +8,14 @@
         "source": "/home/cycoe/.android/build-cache/840d6a41ec5f82de4fb4714735f04806d4f773cb/output/res/anim/abc_slide_in_bottom.xml"
     },
     {
+        "merged": "/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/res/merged/release/anim/fadehide.xml",
+        "source": "/home/cycoe/AndroidStudioProjects/Memo/app/src/main/res/anim/fadehide.xml"
+    },
+    {
+        "merged": "/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/res/merged/release/anim/fadeshow.xml",
+        "source": "/home/cycoe/AndroidStudioProjects/Memo/app/src/main/res/anim/fadeshow.xml"
+    },
+    {
         "merged": "/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/res/merged/release/anim/abc_slide_in_top.xml",
         "source": "/home/cycoe/.android/build-cache/840d6a41ec5f82de4fb4714735f04806d4f773cb/output/res/anim/abc_slide_in_top.xml"
     },
@@ -34,6 +42,10 @@
     {
         "merged": "/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/res/merged/release/anim/abc_grow_fade_in_from_bottom.xml",
         "source": "/home/cycoe/.android/build-cache/840d6a41ec5f82de4fb4714735f04806d4f773cb/output/res/anim/abc_grow_fade_in_from_bottom.xml"
+    },
+    {
+        "merged": "/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/res/merged/release/anim/fadeshow_with_trans.xml",
+        "source": "/home/cycoe/AndroidStudioProjects/Memo/app/src/main/res/anim/fadeshow_with_trans.xml"
     },
     {
         "merged": "/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/res/merged/release/anim/abc_fade_out.xml",

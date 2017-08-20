@@ -2,7 +2,6 @@ package win.cycoe.memo;
 
 import android.content.ClipboardManager;
 import android.content.Context;
-import android.content.ContextWrapper;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -19,7 +18,6 @@ import android.text.InputFilter;
 import android.text.InputType;
 import android.text.Spanned;
 import android.view.ContextMenu;
-import android.view.ContextThemeWrapper;
 import android.view.View;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -37,6 +35,7 @@ import java.util.List;
 import win.cycoe.memo.Handler.ConfigHandler;
 import win.cycoe.memo.Handler.DatabaseHandler;
 import win.cycoe.memo.Handler.DateParser;
+import win.cycoe.memo.Handler.DialogBuilder;
 import win.cycoe.memo.Handler.Finder;
 
 
@@ -54,10 +53,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private Intent intent;
     private SQLiteDatabase db;
     private DatabaseHandler dbHandler;
-    private DialogBuiler builer;
+    private DialogBuilder builder;
     private Finder finder;
     private DateParser dateParser;
     private InputFilter filter;
+    private ConfigHandler configHandler;
 
     private DialogInterface.OnClickListener clickListenerNewTab;
     private DialogInterface.OnClickListener clickListenerRenameTab;
@@ -69,15 +69,16 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private List<String> tableViewData;
     private int currentTable = 0;
     private int selectTable;
+    private int mainTheme;
+    private int dialogTheme;
 
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        SharedPreferences pref = getSharedPreferences("config", MODE_PRIVATE);
-        ConfigHandler configHandler = new ConfigHandler(pref);
-        setTheme(configHandler.getValue("darkTheme") == 1 ? R.style.AppTheme_dark : R.style.AppTheme);
+        loadConfig();
+        setTheme(mainTheme);
         setContentView(R.layout.drawer_layout);
 
         initData();
@@ -99,17 +100,49 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 dbHandler.addItemInDatabase(data.getStringArrayExtra("content"));
             else
                 dbHandler.modifyItemInDatabase(requestCode - 1, data.getStringArrayExtra("content"));
+            refreshListView(null);
         }
-        else if(resultCode == 2 && requestCode != 0)
+        else if(resultCode == 2 && requestCode != 0) {
             dbHandler.deleteItemInDatabase(requestCode - 1);
-        refreshListView();
+            refreshListView(null);
+        }
+        else if(resultCode == 3 && data.getBooleanExtra("refresh", false)) {
+            db.close();
+            db = openOrCreateDatabase("memo.db", MODE_PRIVATE, null);
+            dbHandler = new DatabaseHandler(db);
+            dbHandler.readTables();
+            if(dbHandler.tbList.length == 0)
+                dbHandler.createTable("默认");
+            refreshTableView();
+            currentTable = 0;
+            setTitle(dbHandler.tbList[currentTable]);
+            tableView.setItemChecked(currentTable, true);
+            dbHandler.handle(dbHandler.tbList[currentTable]);
+            refreshListView(null);
+        }
+    }
+
+    private void loadConfig() {
+        SharedPreferences pref = getSharedPreferences("config", MODE_PRIVATE);
+        configHandler = new ConfigHandler(pref);
+        mainTheme = configHandler.getValue("darkTheme") == 1 ? R.style.AppTheme_dark : R.style.AppTheme;
+        dialogTheme = configHandler.getValue("darkTheme") == 1 ? R.style.DialogTheme_dark : R.style.DialogTheme;
     }
 
     private void initData() {
         intent = new Intent(this, ContentActivity.class);
-        builer = new DialogBuiler(this);
+        builder = new DialogBuilder(this, dialogTheme);
         finder = new Finder();
         dateParser = new DateParser();
+        filter = new InputFilter() {
+            @Override
+            public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
+                if(source.equals(" "))
+                    return "";
+                else
+                    return null;
+            }
+        };
         // request storage permission
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
             requestPermissions(permissions, 321);
@@ -161,7 +194,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 if(currentTable == selectTable) {
                     currentTable = 0;
                     dbHandler.handle(dbHandler.tbList[currentTable]);
-                    refreshListView();
+                    refreshListView(null);
                     tableView.setItemChecked(currentTable, true);
                     setTitle(dbHandler.tbList[currentTable]);
                     DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -177,16 +210,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         listView = (ListView) findViewById(R.id.listView);
         tableView = (ListView) findViewById(R.id.tableView);
         newTableButton = (ImageButton) findViewById(R.id.newTabButton);
-        filter = new InputFilter() {
-            @Override
-            public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
-                if(source.equals(" "))
-                    return "";
-                else
-                    return null;
-            }
-        };
-
         newTableButton.setOnClickListener(this);
     }
 
@@ -244,8 +267,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         tableView.setItemChecked(currentTable, true);
     }
 
-    private void refreshListView() {
-        dbHandler.readDatabase();
+    private void refreshListView(String[] filter) {
+        dbHandler.readDatabase(filter);
         mainBeanList.removeAll(mainBeanList);
         getListViewData();
         mainAdapter.notifyDataSetChanged();
@@ -280,7 +303,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             dbHandler.createTable("默认");
         dbHandler.readTables();
         dbHandler.handle(dbHandler.tbList[currentTable]);
-        dbHandler.readDatabase();
+        dbHandler.readDatabase(null);
     }
 
     @Override
@@ -311,18 +334,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                mainBeanList.removeAll(mainBeanList);
-
-                for(int i = 0; i < dbHandler.contentList.length; i++) {
-                    if(finder.findAllInString(dbHandler.contentList[i][0], newText.split(" "))
-                            || finder.findAllInString(dbHandler.contentList[i][1], newText.split(" "))
-                            || finder.findAllInString(dateParser.getRelativeTime(dbHandler.contentList[i][2]), newText.split(" ")))
-                        mainBeanList.add(new MainBean(dbHandler.contentList[i][0],
-                                dbHandler.contentList[i][1],
-                                dateParser.getRelativeTime(dbHandler.contentList[i][2])));
-                }
-
-                mainAdapter.notifyDataSetChanged();
+                refreshListView(newText.split(" "));
                 return true;
             }
         });
@@ -339,7 +351,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            Intent intent = new Intent(MainActivity.this, SettingActivity.class);
+            Intent intent = new Intent(this, SettingActivity.class);
             startActivityForResult(intent, 0);
             return true;
         }
@@ -356,7 +368,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 break;
             case R.id.tableView:
                 dbHandler.handle(dbHandler.tbList[position]);
-                refreshListView();
+                refreshListView(null);
                 setTitle(dbHandler.tbList[position]);
                 DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
                 if (drawer.isDrawerOpen(GravityCompat.START)) {
@@ -372,8 +384,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         listView.setOnCreateContextMenuListener(new View.OnCreateContextMenuListener() {
             @Override
             public void onCreateContextMenu(ContextMenu contextMenu, View view, ContextMenu.ContextMenuInfo contextMenuInfo) {
-                contextMenu.add(0, 0, 0, R.string.delete);
-                contextMenu.add(0, 1, 0, R.string.copyToClipBoard);
+                contextMenu.add(0, 0, 0, R.string.copyToClipBoard);
+                contextMenu.add(0, 1, 0, R.string.delete);
             }
         });
 
@@ -390,23 +402,23 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private void listViewContextClick(int itemId, int position) {
         switch (itemId) {
             case 0:
+                ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                clipboard.setText(dbHandler.contentList[position][1]);
+                Snackbar.make(listView, "已复制到剪贴板", Snackbar.LENGTH_SHORT).show();
+                break;
+
+            case 1:
                 dbHandler.deleteItemInDatabase(position);
-                refreshListView();
+                refreshListView(null);
                 Snackbar.make(listView, "是否撤销删除", Snackbar.LENGTH_LONG)
                         .setAction("撤销", new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 dbHandler.addItemInDatabase(dbHandler.contentTemp);
-                                refreshListView();
+                                refreshListView(null);
                             }
                         })
                         .show();
-                break;
-
-            case 1:
-                ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-                clipboard.setText(dbHandler.contentList[position][1]);
-                Snackbar.make(listView, "已复制到剪贴板", Snackbar.LENGTH_SHORT).show();
                 break;
         }
     }
@@ -419,11 +431,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 tableNameInput.setFilters(new InputFilter[] {filter});
                 tableNameInput.setInputType(InputType.TYPE_CLASS_TEXT);
                 tableNameInput.setHint(dbHandler.tbList[position]);
-                builer.createDialog("提示", "请输入新分类的名称", clickListenerRenameTab, clickListenerNothing, tableNameInput);
+                builder.createDialog("提示", "请输入新分类的名称", clickListenerRenameTab, clickListenerNothing, tableNameInput);
                 break;
 
             case 1:
-                builer.createDialog("警告", "是否删除此分类", clickListenerDelTab, clickListenerNothing, null);
+                builder.createDialog("警告", "是否删除此分类", clickListenerDelTab, clickListenerNothing, null);
                 break;
         }
     }
@@ -449,7 +461,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 tableNameInput = new EditText(this);
                 tableNameInput.setFilters(new InputFilter[] {filter});
                 tableNameInput.setInputType(InputType.TYPE_CLASS_TEXT);
-                builer.createDialog("提示", "输入新建分类名称", clickListenerNewTab, clickListenerNothing, tableNameInput);
+                builder.createDialog("提示", "输入新建分类名称", clickListenerNewTab, clickListenerNothing, tableNameInput);
                 break;
         }
     }

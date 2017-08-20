@@ -20,6 +20,7 @@ import java.util.List;
 
 import win.cycoe.memo.Handler.ConfigHandler;
 import win.cycoe.memo.Handler.DatabaseHandler;
+import win.cycoe.memo.Handler.DialogBuilder;
 
 /**
  * Created by cycoe on 17-8-15.
@@ -31,20 +32,22 @@ public class SettingActivity extends Activity implements AdapterView.OnItemClick
     private ListView listViewOthers;
     private ListView listViewEditor;
 
-    private List<SettingBean> otherBeanList;
-    private List<SettingBean> editorBeanList;
     private SettingAdapter othersAdapter;
     private SettingAdapter editAdapter;
-    private DialogBuiler builer;
+    private DialogBuilder builer;
     private ConfigHandler configHandler;
-    private SharedPreferences pref;
     private DatabaseHandler dbHandler;
+    private Intent intent;
 
-    private String license;
+    private List<SettingBean> otherBeanList;
+    private List<SettingBean> editorBeanList;
+    private int mainTheme;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        loadConfig();
+        setTheme(mainTheme);
         super.onCreate(savedInstanceState);
         SharedPreferences pref = getSharedPreferences("config", MODE_PRIVATE);
         ConfigHandler configHandler = new ConfigHandler(pref);
@@ -58,12 +61,17 @@ public class SettingActivity extends Activity implements AdapterView.OnItemClick
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
         setBack();
     }
 
+    private void loadConfig() {
+        SharedPreferences pref = getSharedPreferences("config", MODE_PRIVATE);
+        configHandler = new ConfigHandler(pref);
+        mainTheme = configHandler.getValue("darkTheme") == 1 ? R.style.AppTheme_dark : R.style.AppTheme;
+    }
+
     private void initData() {
-        pref = getSharedPreferences("config", MODE_PRIVATE);
+        SharedPreferences pref = getSharedPreferences("config", MODE_PRIVATE);
         configHandler = new ConfigHandler(pref);
 
         otherBeanList = new ArrayList<>();
@@ -77,8 +85,9 @@ public class SettingActivity extends Activity implements AdapterView.OnItemClick
         editorBeanList.add(new SettingBean("显示图片边框", "Markdown 预览图片显示边框", configHandler.getValue("showBorder")));
         editorBeanList.add(new SettingBean("暗色主题", "重启应用生效", configHandler.getValue("darkTheme")));
 
-        builer = new DialogBuiler(this);
+        builer = new DialogBuilder(this, mainTheme);
         dbHandler = new DatabaseHandler();
+        intent = new Intent();
     }
 
     private void initView() {
@@ -112,7 +121,8 @@ public class SettingActivity extends Activity implements AdapterView.OnItemClick
         configHandler.createKV("fullScreen", isSelectedEdit.get(0) ? 1 : 0);
         configHandler.createKV("showBorder", isSelectedEdit.get(1) ? 1 : 0);
         configHandler.createKV("darkTheme", isSelectedEdit.get(2) ? 1 : 0);
-        setResult(3);
+
+        setResult(3, intent);
         finish();
     }
 
@@ -120,7 +130,7 @@ public class SettingActivity extends Activity implements AdapterView.OnItemClick
         InputStream is = getResources().openRawResource(R.raw.license);
         InputStreamReader isr = new InputStreamReader(is);
         BufferedReader br = new BufferedReader(isr);
-        license = "";
+        String license = "";
         try {
             for (String out = ""; out != null; out = br.readLine()) {
                 license += out;
@@ -138,6 +148,7 @@ public class SettingActivity extends Activity implements AdapterView.OnItemClick
             case R.id.listViewOthers:
                 switch (position) {
                     case 0:
+                        intent.putExtra("refresh", true);
                         Snackbar.make(listViewOthers, dbHandler.exportDb(false) ? "导入数据库成功" : "导入数据库失败", Snackbar.LENGTH_SHORT).show();
                         break;
                     case 1:

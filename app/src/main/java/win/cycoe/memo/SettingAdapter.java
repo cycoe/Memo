@@ -18,7 +18,6 @@ import java.util.List;
 public class SettingAdapter extends BaseAdapter {
 
     private HashMap<Integer, Boolean> isSelected;
-
     private List<SettingBean> settingBeanList;
     private LayoutInflater inflater;
 
@@ -63,9 +62,8 @@ public class SettingAdapter extends BaseAdapter {
             viewHolder.settingCheck = (CheckBox) convertView.findViewById(R.id.settingCheck);
             convertView.setTag(viewHolder);
         }
-        else {
+        else
             viewHolder = (ViewHolder) convertView.getTag();
-        }
 
         SettingBean settingBean = settingBeanList.get(position);
         viewHolder.settingTitle.setText(settingBean.settingTitle);

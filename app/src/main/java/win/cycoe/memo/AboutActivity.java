@@ -24,18 +24,26 @@ public class AboutActivity extends Activity {
     private Toolbar aboutToolbar;
     private TextView aboutView;
 
+    private ConfigHandler configHandler;
+
     private String about;
+    private int colorTheme;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        SharedPreferences pref = getSharedPreferences("config", MODE_PRIVATE);
-        ConfigHandler configHandler = new ConfigHandler(pref);
-        setTheme(configHandler.getValue("darkTheme") == 1 ? R.style.AppTheme_dark : R.style.AppTheme);
+        loadConfig();
+        setTheme(colorTheme);
         setContentView(R.layout.activity_about);
 
         setToolbar();
         initView();
+    }
+
+    private void loadConfig() {
+        SharedPreferences pref = getSharedPreferences("config", MODE_PRIVATE);
+        configHandler = new ConfigHandler(pref);
+        colorTheme = configHandler.getValue("darkTheme") == 1 ? R.style.AppTheme_dark : R.style.AppTheme;
     }
 
     private void setToolbar() {

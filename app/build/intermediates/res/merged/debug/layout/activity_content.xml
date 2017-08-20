@@ -72,7 +72,8 @@
                     android:textColor="?attr/primaryTextColor"
                     android:inputType="textMultiLine"
                     android:background="@null"
-                    android:hint="@string/content" />
+                    android:hint="@string/content"
+                    android:textColorHint="?attr/tertiaryTextColor"/>
 
             </ScrollView>
 

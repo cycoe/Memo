@@ -27,6 +27,7 @@ import java.util.Map;
 import win.cycoe.memo.Handler.ConfigHandler;
 import win.cycoe.memo.Handler.ContentStack;
 import win.cycoe.memo.Handler.DateParser;
+import win.cycoe.memo.Handler.DialogBuilder;
 import win.cycoe.memo.Handler.MdASyncTask;
 import win.cycoe.memo.Handler.SpanHandler;
 import win.cycoe.memo.Handler.StopCharHandler;
@@ -65,7 +66,7 @@ public class ContentActivity extends Activity implements View.OnClickListener, V
 
     private ContentStack contentStack;
     private StopCharHandler stopCharHandler;
-    private DialogBuiler builer;
+    private DialogBuilder builder;
     private SharedPreferences pref;
     private ConfigHandler configHandler;
     private SpanHandler spanHandler;
@@ -80,13 +81,14 @@ public class ContentActivity extends Activity implements View.OnClickListener, V
     private boolean isInput = true;
     private boolean isisInput = true;
     private boolean isModified = false;
+    private int mainTheme;
+    private int dialogTheme;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        SharedPreferences pref = getSharedPreferences("config", MODE_PRIVATE);
-        ConfigHandler configHandler = new ConfigHandler(pref);
-        setTheme(configHandler.getValue("darkTheme") == 1 ? R.style.AppTheme_dark : R.style.AppTheme);
+        loadConfig();
+        setTheme(mainTheme);
         setContentView(R.layout.activity_content);
 
         initView();
@@ -138,6 +140,13 @@ public class ContentActivity extends Activity implements View.OnClickListener, V
                 switchMdView();
                 break;
         }
+    }
+
+    private void loadConfig() {
+        SharedPreferences pref = getSharedPreferences("config", MODE_PRIVATE);
+        configHandler = new ConfigHandler(pref);
+        mainTheme = configHandler.getValue("darkTheme") == 1 ? R.style.AppTheme_dark : R.style.AppTheme;
+        dialogTheme = configHandler.getValue("darkTheme") == 1 ? R.style.DialogTheme_dark : R.style.DialogTheme;
     }
 
     // initiate view by id
@@ -215,7 +224,7 @@ public class ContentActivity extends Activity implements View.OnClickListener, V
         spanHandler = new SpanHandler(contentLine);
         dateParser = new DateParser();
 
-        builer = new DialogBuiler(this);
+        builder = new DialogBuilder(this, dialogTheme);
 
         pref = getSharedPreferences("config", MODE_PRIVATE);
         configHandler = new ConfigHandler(pref);
@@ -293,7 +302,7 @@ public class ContentActivity extends Activity implements View.OnClickListener, V
     }
 
     private void deleteWithConfirm() {
-        builer.createDialog("警告", "是否删除此便签", clickListenerDel, clickListenerNothing);
+        builder.createDialog("警告", "是否删除此便签", clickListenerDel, clickListenerNothing);
     }
 
     private void setBackWithConfirm() {
@@ -307,9 +316,9 @@ public class ContentActivity extends Activity implements View.OnClickListener, V
             if(titleLine.getText().toString().trim().isEmpty()
                     && contentLine.getText().toString().trim().isEmpty()
                     && !content[2].isEmpty())
-                builer.createDialog("警告", "是否删除此空白便签", clickListenerDel, clickListenerDiscard);
+                builder.createDialog("警告", "是否删除此空白便签", clickListenerDel, clickListenerDiscard);
             else
-                builer.createDialog("提示", "是否保存", clickListenerSave, clickListenerDiscard);
+                builder.createDialog("提示", "是否保存", clickListenerSave, clickListenerDiscard);
         }
         else
             setBack(false, UNMODIFIED);

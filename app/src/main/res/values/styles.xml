@@ -13,6 +13,8 @@
         <item name="secondaryTextColor">@color/secondary_text_light</item>
         <item name="tertiaryTextColor">@color/tertiary_text_light</item>
         <item name="groupTextColor">@color/colorPrimary_light</item>
+        <item name="android:textColorPrimary">@color/primary_text_light</item>
+        <item name="android:textColorSecondary">@color/secondary_text_light</item>
     </style>
 
     <style name="AppTheme.dark" parent="AppTheme.base" >
@@ -26,6 +28,18 @@
         <item name="secondaryTextColor">@color/secondary_text_dark</item>
         <item name="tertiaryTextColor">@color/tertiary_text_dark</item>
         <item name="groupTextColor">@color/colorAccent_light</item>
+        <item name="android:textColorPrimary">@color/primary_text_dark</item>
+        <item name="android:textColorSecondary">@color/secondary_text_dark</item>
+    </style>
+
+    <style name="DialogTheme" parent="AppTheme">
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:backgroundDimEnabled">true</item>
+    </style>
+
+    <style name="DialogTheme.dark" parent="AppTheme.dark">
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:backgroundDimEnabled">true</item>
     </style>
 
     <style name="AppTheme.NoActionBar">

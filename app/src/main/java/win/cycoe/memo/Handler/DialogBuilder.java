@@ -1,20 +1,22 @@
-package win.cycoe.memo;
+package win.cycoe.memo.Handler;
 
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.view.View;
 
+import win.cycoe.memo.R;
+
 /**
  * Created by cycoe on 17-8-13.
  */
 
-public class DialogBuiler {
+public class DialogBuilder {
 
     private AlertDialog.Builder builder;
 
-    public DialogBuiler(Context context){
-        builder = new AlertDialog.Builder(context);
+    public DialogBuilder(Context context, int theme){
+        builder = new AlertDialog.Builder(context, theme);
     }
 
     public void createDialog(String title,

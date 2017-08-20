@@ -62,10 +62,30 @@ public class DatabaseHandler {
         contentTemp = contentList[position];
     }
 
-    public void readDatabase() {
-        Cursor cr = db.rawQuery("select * from " + tb + " ORDER BY date desc", null);
+    public void readDatabase(String[] filter) {
+        String queryString;
+        String[] argvList;
+        if(filter == null) {
+            queryString = null;
+            argvList = null;
+        } else {
+            queryString = "";
+            argvList = new String[HEADERLIST.length * filter.length];
+            for (int i = 0; i < HEADERLIST.length; i++) {
+                for (int j = 0; j < filter.length; j++) {
+                    queryString += HEADERLIST[i];
+                    queryString += " LIKE ?";
+                    if (j < filter.length - 1)
+                        queryString += " and ";
+                    argvList[i * filter.length + j] = "%" + filter[j] + "%";
+                }
+                if (i < HEADERLIST.length - 1)
+                    queryString += " or ";
+            }
+        }
+        Cursor cr = db.query(tb, null, queryString, argvList, null, null, "date DESC");
         idList = new int[cr.getCount()];
-        contentList = new String[cr.getCount()][4];
+        contentList = new String[cr.getCount()][3];
         for(int i = 0; cr.moveToNext(); i++) {
             idList[i] = cr.getInt(cr.getColumnIndex("_id"));
             for(int j = 0; j < HEADERLIST.length; j++)

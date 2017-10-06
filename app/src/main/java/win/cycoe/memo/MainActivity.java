@@ -4,7 +4,6 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 import android.os.Bundle;
@@ -19,7 +18,6 @@ import android.text.InputType;
 import android.text.Spanned;
 import android.view.ContextMenu;
 import android.view.View;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -32,14 +30,15 @@ import android.widget.ListView;
 import java.util.ArrayList;
 import java.util.List;
 
-import win.cycoe.memo.Handler.ConfigHandler;
 import win.cycoe.memo.Handler.DatabaseHandler;
 import win.cycoe.memo.Handler.DateParser;
 import win.cycoe.memo.Handler.DialogBuilder;
 import win.cycoe.memo.Handler.Finder;
 
 
-public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener, View.OnClickListener {
+public class MainActivity extends MyActivity
+        implements AdapterView.OnItemClickListener,
+        View.OnClickListener{
 
     private final String[] permissions = {android.Manifest.permission.WRITE_EXTERNAL_STORAGE};
 
@@ -57,7 +56,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private Finder finder;
     private DateParser dateParser;
     private InputFilter filter;
-    private ConfigHandler configHandler;
 
     private DialogInterface.OnClickListener clickListenerNewTab;
     private DialogInterface.OnClickListener clickListenerRenameTab;
@@ -69,16 +67,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private List<String> tableViewData;
     private int currentTable = 0;
     private int selectTable;
-    private int mainTheme;
-    private int dialogTheme;
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        loadConfig();
-        setTheme(mainTheme);
         setContentView(R.layout.drawer_layout);
 
         initData();
@@ -102,10 +94,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 dbHandler.modifyItemInDatabase(requestCode - 1, data.getStringArrayExtra("content"));
             refreshListView(null);
         }
+
         else if(resultCode == 2 && requestCode != 0) {
             dbHandler.deleteItemInDatabase(requestCode - 1);
             refreshListView(null);
         }
+
         else if(resultCode == 3 && data.getBooleanExtra("refresh", false)) {
             db.close();
             db = openOrCreateDatabase("memo.db", MODE_PRIVATE, null);
@@ -113,6 +107,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             dbHandler.readTables();
             if(dbHandler.tbList.length == 0)
                 dbHandler.createTable("默认");
+
             refreshTableView();
             currentTable = 0;
             setTitle(dbHandler.tbList[currentTable]);
@@ -120,18 +115,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             dbHandler.handle(dbHandler.tbList[currentTable]);
             refreshListView(null);
         }
-    }
 
-    private void loadConfig() {
-        SharedPreferences pref = getSharedPreferences("config", MODE_PRIVATE);
-        configHandler = new ConfigHandler(pref);
-        mainTheme = configHandler.getValue("darkTheme") == 1 ? R.style.AppTheme_dark : R.style.AppTheme;
-        dialogTheme = configHandler.getValue("darkTheme") == 1 ? R.style.DialogTheme_dark : R.style.DialogTheme;
+        reloadActivity();
     }
 
     private void initData() {
         intent = new Intent(this, ContentActivity.class);
-        builder = new DialogBuilder(this, dialogTheme);
+        builder = new DialogBuilder(this, getDialogTheme());
         finder = new Finder();
         dateParser = new DateParser();
         filter = new InputFilter() {
@@ -211,6 +201,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         tableView = (ListView) findViewById(R.id.tableView);
         newTableButton = (ImageButton) findViewById(R.id.newTabButton);
         newTableButton.setOnClickListener(this);
+    }
+
+    private void reloadActivity() {
+        Intent intent = getIntent();
+        finish();
+        startActivity(intent);
     }
 
     private void setFloatButton() {

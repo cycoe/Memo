@@ -23,28 +23,10 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <TextView
+    <FrameLayout
+        android:id="@+id/settingWrapper"
+        android:layout_height="0dp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textColor="?attr/groupTextColor"
-        android:text="@string/edit"
-        android:layout_margin="10dp" />
-
-    <ListView
-        android:id="@+id/listViewEditor"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textColor="?attr/groupTextColor"
-        android:text="@string/others"
-        android:layout_margin="10dp" />
-
-    <ListView
-        android:id="@+id/listViewOthers"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_weight="1" />
 
 </LinearLayout>

@@ -28,12 +28,12 @@
         "source": "/home/cycoe/.android/build-cache/a22c32e9791e9c0d61f5b3a2b20deb84fd7adfd4/output/res/layout/design_navigation_item_header.xml"
     },
     {
-        "merged": "/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/res/merged/release/layout/select_dialog_singlechoice_material.xml",
-        "source": "/home/cycoe/.android/build-cache/840d6a41ec5f82de4fb4714735f04806d4f773cb/output/res/layout/select_dialog_singlechoice_material.xml"
-    },
-    {
         "merged": "/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/res/merged/release/layout/abc_action_menu_layout.xml",
         "source": "/home/cycoe/.android/build-cache/840d6a41ec5f82de4fb4714735f04806d4f773cb/output/res/layout/abc_action_menu_layout.xml"
+    },
+    {
+        "merged": "/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/res/merged/release/layout/select_dialog_singlechoice_material.xml",
+        "source": "/home/cycoe/.android/build-cache/840d6a41ec5f82de4fb4714735f04806d4f773cb/output/res/layout/select_dialog_singlechoice_material.xml"
     },
     {
         "merged": "/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/res/merged/release/layout/abc_action_mode_bar.xml",
@@ -68,12 +68,12 @@
         "source": "/home/cycoe/.android/build-cache/a22c32e9791e9c0d61f5b3a2b20deb84fd7adfd4/output/res/layout/design_navigation_menu_item.xml"
     },
     {
-        "merged": "/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/res/merged/release/layout/activity_main.xml",
-        "source": "/home/cycoe/AndroidStudioProjects/Memo/app/src/main/res/layout/activity_main.xml"
-    },
-    {
         "merged": "/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/res/merged/release/layout/abc_search_dropdown_item_icons_2line.xml",
         "source": "/home/cycoe/.android/build-cache/840d6a41ec5f82de4fb4714735f04806d4f773cb/output/res/layout/abc_search_dropdown_item_icons_2line.xml"
+    },
+    {
+        "merged": "/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/res/merged/release/layout/activity_main.xml",
+        "source": "/home/cycoe/AndroidStudioProjects/Memo/app/src/main/res/layout/activity_main.xml"
     },
     {
         "merged": "/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/res/merged/release/layout/abc_alert_dialog_button_bar_material.xml",

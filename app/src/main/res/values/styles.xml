@@ -9,12 +9,17 @@
         <item name="android:navigationBarColor">@color/colorAccent_light</item>
         <item name="android:statusBarColor">@color/colorSecondary_light</item>
         <item name="android:colorBackground">@color/white</item>
+        <item name="android:colorForeground">@color/primary_text_light</item>
         <item name="primaryTextColor">@color/primary_text_light</item>
         <item name="secondaryTextColor">@color/secondary_text_light</item>
         <item name="tertiaryTextColor">@color/tertiary_text_light</item>
         <item name="groupTextColor">@color/colorPrimary_light</item>
+        <item name="android:alertDialogTheme">@style/DialogTheme</item>
         <item name="android:textColorPrimary">@color/primary_text_light</item>
+        <item name="android:textColorPrimaryInverse">@color/primary_text_dark</item>
         <item name="android:textColorSecondary">@color/secondary_text_light</item>
+        <item name="android:textColorSecondaryInverse">@color/secondary_text_dark</item>
+        <item name="android:windowBackground">@color/white</item>
     </style>
 
     <style name="AppTheme.dark" parent="AppTheme.base" >
@@ -24,22 +29,24 @@
         <item name="android:navigationBarColor">@color/colorPrimary_dark</item>
         <item name="android:statusBarColor">@color/colorSecondary_dark</item>
         <item name="android:colorBackground">@color/colorPrimary_dark</item>
+        <item name="android:colorForeground">@color/primary_text_dark</item>
         <item name="primaryTextColor">@color/primary_text_dark</item>
         <item name="secondaryTextColor">@color/secondary_text_dark</item>
         <item name="tertiaryTextColor">@color/tertiary_text_dark</item>
         <item name="groupTextColor">@color/colorAccent_light</item>
+        <item name="android:alertDialogTheme">@style/DialogTheme.dark</item>
         <item name="android:textColorPrimary">@color/primary_text_dark</item>
+        <item name="android:textColorPrimaryInverse">@color/primary_text_light</item>
         <item name="android:textColorSecondary">@color/secondary_text_dark</item>
+        <item name="android:textColorSecondaryInverse">@color/secondary_text_light</item>
+        <item name="android:windowBackground">@color/colorPrimary_dark</item>
     </style>
 
-    <style name="DialogTheme" parent="AppTheme">
-        <item name="android:windowIsFloating">true</item>
-        <item name="android:backgroundDimEnabled">true</item>
+    <!--theme of dialogs-->
+    <style name="DialogTheme" parent="@android:style/Theme.Material.Light.Dialog.Alert">
     </style>
 
-    <style name="DialogTheme.dark" parent="AppTheme.dark">
-        <item name="android:windowIsFloating">true</item>
-        <item name="android:backgroundDimEnabled">true</item>
+    <style name="DialogTheme.dark" parent="@android:style/Theme.Material.Dialog.Alert">
     </style>
 
     <style name="AppTheme.NoActionBar">
@@ -47,6 +54,7 @@
         <item name="windowNoTitle">true</item>
     </style>
 
+    <!--basic themes-->
     <style name="AppTheme.base" parent="Theme.AppCompat.Light">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>

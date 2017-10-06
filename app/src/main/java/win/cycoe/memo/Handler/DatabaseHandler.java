@@ -71,16 +71,19 @@ public class DatabaseHandler {
         } else {
             queryString = "";
             argvList = new String[HEADERLIST.length * filter.length];
-            for (int i = 0; i < HEADERLIST.length; i++) {
-                for (int j = 0; j < filter.length; j++) {
-                    queryString += HEADERLIST[i];
+
+            for (int i = 0; i < filter.length; i++) {
+                queryString += "(";
+                for (int j = 0; j < HEADERLIST.length; j++) {
+                    queryString += HEADERLIST[j];
                     queryString += " LIKE ?";
-                    if (j < filter.length - 1)
-                        queryString += " and ";
-                    argvList[i * filter.length + j] = "%" + filter[j] + "%";
+                    if (j < HEADERLIST.length - 1)
+                        queryString += " or ";
+                    argvList[i * HEADERLIST.length + j] = "%" + filter[i] + "%";
                 }
-                if (i < HEADERLIST.length - 1)
-                    queryString += " or ";
+                queryString += ")";
+                if (i < filter.length - 1)
+                    queryString += " and ";
             }
         }
         Cursor cr = db.query(tb, null, queryString, argvList, null, null, "date DESC");

@@ -37,11 +37,11 @@
             android:label="@string/app_name" >
         </activity>
         <activity
-            android:name="win.cycoe.memo.SettingActivity"
+            android:name="win.cycoe.memo.AboutActivity"
             android:label="@string/app_name" >
         </activity>
         <activity
-            android:name="win.cycoe.memo.AboutActivity"
+            android:name="win.cycoe.memo.SettingActivity"
             android:label="@string/app_name" >
         </activity>
     </application>

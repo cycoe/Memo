@@ -1,1 +1,6 @@
-[]
+[
+    {
+        "merged": "/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/res/merged/debug/xml/preference_setting.xml",
+        "source": "/home/cycoe/AndroidStudioProjects/Memo/app/src/main/res/xml/preference_setting.xml"
+    }
+]

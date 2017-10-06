@@ -1,11 +1,11 @@
 package win.cycoe.memo;
 
-import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
@@ -24,7 +24,6 @@ import com.zzhoujay.richtext.RichText;
 
 import java.util.Map;
 
-import win.cycoe.memo.Handler.ConfigHandler;
 import win.cycoe.memo.Handler.ContentStack;
 import win.cycoe.memo.Handler.DateParser;
 import win.cycoe.memo.Handler.DialogBuilder;
@@ -38,7 +37,8 @@ import win.cycoe.memo.Handler.UriToPathUtil;
  * Created by cycoe on 7/27/17.
  */
 
-public class ContentActivity extends Activity implements View.OnClickListener, View.OnFocusChangeListener {
+public class ContentActivity extends MyActivity
+        implements View.OnClickListener, View.OnFocusChangeListener {
 
     // set the constants of resultCodes
     private final int UNMODIFIED = 0;
@@ -68,7 +68,6 @@ public class ContentActivity extends Activity implements View.OnClickListener, V
     private StopCharHandler stopCharHandler;
     private DialogBuilder builder;
     private SharedPreferences pref;
-    private ConfigHandler configHandler;
     private SpanHandler spanHandler;
     private DateParser dateParser;
 
@@ -81,14 +80,10 @@ public class ContentActivity extends Activity implements View.OnClickListener, V
     private boolean isInput = true;
     private boolean isisInput = true;
     private boolean isModified = false;
-    private int mainTheme;
-    private int dialogTheme;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        loadConfig();
-        setTheme(mainTheme);
         setContentView(R.layout.activity_content);
 
         initView();
@@ -140,13 +135,6 @@ public class ContentActivity extends Activity implements View.OnClickListener, V
                 switchMdView();
                 break;
         }
-    }
-
-    private void loadConfig() {
-        SharedPreferences pref = getSharedPreferences("config", MODE_PRIVATE);
-        configHandler = new ConfigHandler(pref);
-        mainTheme = configHandler.getValue("darkTheme") == 1 ? R.style.AppTheme_dark : R.style.AppTheme;
-        dialogTheme = configHandler.getValue("darkTheme") == 1 ? R.style.DialogTheme_dark : R.style.DialogTheme;
     }
 
     // initiate view by id
@@ -217,17 +205,15 @@ public class ContentActivity extends Activity implements View.OnClickListener, V
     // get the Intent Object, get the content string array with key "content"
     private void initData() {
         content = getIntent().getStringArrayExtra("content");
-        contentStack = new ContentStack(10);
+        pref = PreferenceManager.getDefaultSharedPreferences(this);
+        contentStack = new ContentStack(Integer.parseInt(pref.getString("stackDepth", "20")));
         contentStack.put(content[1], content[1].length());
 
         stopCharHandler = new StopCharHandler();
         spanHandler = new SpanHandler(contentLine);
         dateParser = new DateParser();
 
-        builder = new DialogBuilder(this, dialogTheme);
-
-        pref = getSharedPreferences("config", MODE_PRIVATE);
-        configHandler = new ConfigHandler(pref);
+        builder = new DialogBuilder(this, getDialogTheme());
     }
 
     private void fillView() {
@@ -250,17 +236,19 @@ public class ContentActivity extends Activity implements View.OnClickListener, V
     private void switchMdView() {
         Animation fadeShow = AnimationUtils.loadAnimation(this, R.anim.fadeshow);
         Animation fadeHide = AnimationUtils.loadAnimation(this, R.anim.fadehide);
+        Animation transDown = AnimationUtils.loadAnimation(this, R.anim.trans_down);
+        Animation transUp = AnimationUtils.loadAnimation(this, R.anim.trans_up);
 
         mdLayoutView.startAnimation(mdSwitch.isChecked() ? fadeShow : fadeHide);
         mdLayoutView.setVisibility(mdSwitch.isChecked() ? View.VISIBLE : View.GONE);
-        if(configHandler.getValue("fullScreen") == 1) {
+        if(pref.getBoolean("fullscreen", false)) {
             contentView.startAnimation(mdSwitch.isChecked() ? fadeHide : fadeShow);
             contentView.setVisibility(mdSwitch.isChecked() ? View.GONE : View.VISIBLE);
         } else
-            contentView.startAnimation(fadeShow);
+            contentView.startAnimation(mdSwitch.isChecked() ? transDown : transUp);
 
         if(mdSwitch.isChecked())
-            new MdASyncTask(markdownView, loadProgressBar, configHandler.getValue("showBorder") == 1)
+            new MdASyncTask(markdownView, loadProgressBar, pref.getBoolean("imageBorder", false))
                     .execute(contentLine.getText().toString());
         else
             contentLine.requestFocus();
@@ -291,14 +279,8 @@ public class ContentActivity extends Activity implements View.OnClickListener, V
     }
 
     private void setButtonEnabled(View view, boolean flag) {
-        if(flag) {
-            view.setEnabled(flag);
-            view.setAlpha((float) 1);
-        }
-        else {
-            view.setEnabled(flag);
-            view.setAlpha((float) 0.5);
-        }
+        view.setEnabled(flag);
+        view.setAlpha(flag ? (float) 1.0 : (float) 0.5);
     }
 
     private void deleteWithConfirm() {
@@ -316,9 +298,9 @@ public class ContentActivity extends Activity implements View.OnClickListener, V
             if(titleLine.getText().toString().trim().isEmpty()
                     && contentLine.getText().toString().trim().isEmpty()
                     && !content[2].isEmpty())
-                builder.createDialog("警告", "是否删除此空白便签", clickListenerDel, clickListenerDiscard);
+                builder.createDialog(getResources().getString(R.string.warning), "是否删除此空白便签", clickListenerDel, clickListenerDiscard);
             else
-                builder.createDialog("提示", "是否保存", clickListenerSave, clickListenerDiscard);
+                builder.createDialog(getResources().getString(R.string.tip), "是否保存", clickListenerSave, clickListenerDiscard);
         }
         else
             setBack(false, UNMODIFIED);
@@ -354,8 +336,7 @@ public class ContentActivity extends Activity implements View.OnClickListener, V
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(resultCode == RESULT_OK) {
             Uri uri = data.getData();
-            UriToPathUtil uriToPathUtil = new UriToPathUtil();
-            String path = uriToPathUtil.getRealFilePath(this, uri);
+            String path = UriToPathUtil.getRealFilePath(this, uri);
             String fullPath = "![img](" + path + ")";
 
             spanHandler.insertUrl(fullPath);
@@ -372,17 +353,14 @@ public class ContentActivity extends Activity implements View.OnClickListener, V
 
     private void undo() {
         String content = contentLine.getText().toString();
-        int length = contentLine.getText().length();
+        int cursor = contentLine.getSelectionEnd();
         if(isisInput)
-            contentStack.put(content, length);
+            contentStack.put(content, cursor);
         isInput = false;
         Map<String, Object> map = contentStack.undo();
         contentLine.setText((String) map.get("content"));
         contentLine.setSelection((int) map.get("cursor"));
-        if(contentStack.canUndo())
-            setButtonEnabled(undoButton, true);
-        else
-            setButtonEnabled(undoButton, false);
+        setButtonEnabled(undoButton, contentStack.canUndo());
         setButtonEnabled(redoButton, true);
     }
 
@@ -391,10 +369,7 @@ public class ContentActivity extends Activity implements View.OnClickListener, V
         Map<String, Object> map = contentStack.redo();
         contentLine.setText((String) map.get("content"));
         contentLine.setSelection((int) map.get("cursor"));
-        if(contentStack.canRedo())
-            setButtonEnabled(redoButton, true);
-        else
-            setButtonEnabled(redoButton, false);
+        setButtonEnabled(redoButton, contentStack.canRedo());
         setButtonEnabled(undoButton, true);
     }
 
@@ -408,7 +383,6 @@ public class ContentActivity extends Activity implements View.OnClickListener, V
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                itemToolbar.setNavigationIcon(R.mipmap.done);
                 itemToolbar.setNavigationIcon(R.mipmap.done);
                 isModified = true;
             }
@@ -431,7 +405,6 @@ public class ContentActivity extends Activity implements View.OnClickListener, V
             @Override
             public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
                 itemToolbar.setNavigationIcon(R.mipmap.done);
-                itemToolbar.setNavigationIcon(R.mipmap.done);
                 isModified = true;
 
                 if(isInput) {
@@ -446,7 +419,7 @@ public class ContentActivity extends Activity implements View.OnClickListener, V
                 }
 
                 if(mdSwitch.isChecked())
-                    new MdASyncTask(markdownView, loadProgressBar, configHandler.getValue("showBorder") == 1)
+                    new MdASyncTask(markdownView, loadProgressBar, pref.getBoolean("imageBorder", false))
                             .execute(contentLine.getText().toString());
             }
 

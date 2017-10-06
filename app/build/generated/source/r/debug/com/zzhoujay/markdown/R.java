@@ -8,6 +8,6 @@ package com.zzhoujay.markdown;
 
 public final class R {
     public static final class string {
-        public static final int app_name = 0x7f090023;
+        public static final int app_name = 0x7f0a0023;
     }
 }

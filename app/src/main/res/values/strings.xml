@@ -11,7 +11,6 @@
     <string name="yes">是</string>
     <string name="no">否</string>
     <string name="delete">删除</string>
-    <string name="lastModifiedTime">最后修改时间：</string>
     <string name="tip">提示</string>
     <string name="copyToClipBoard">复制到剪贴板</string>
     <string name="create">新建</string>
@@ -24,6 +23,25 @@
     <string name="addNew">新建</string>
     <string name="about">关于</string>
     <string name="search">搜索</string>
+    <string name="ui">界面</string>
+    <string name="markdown_fullscreen">Markdown 全屏预览</string>
+    <string name="markdown_fullscreen_off">Markdown 已启用半屏显示</string>
+    <string name="markdown_fullscreen_on">Markdown 已启用全屏显示</string>
+    <string name="show_image_border">显示图片边框</string>
+    <string name="show_image_border_off">已关闭图片边框</string>
+    <string name="show_image_border_on">图片边框将以红线描出</string>
+    <string name="dark_theme">暗色主题</string>
+    <string name="dark_theme_off">已启用亮色主题</string>
+    <string name="dark_theme_on">已启用暗色主题</string>
+    <string name="import_database">导入数据库</string>
+    <string name="export_database">导出数据库</string>
+    <string name="export_database_summary">导出至目录 /Sdcard/Memo/memo.db</string>
+    <string name="license_type">The MIT License</string>
+    <string name="undo_history_num">撤销历史缓存条数</string>
+    <string name="undo_history_num_input">请输入需要缓存的条数</string>
+    <string name="undo_history_num_summary">更多的撤销缓存将消耗更多内存</string>
+    <string name="confirm">确定</string>
+    <string name="cancel">取消</string>
 
 
 </resources>

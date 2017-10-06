@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ 对于该文件需要注意以下几点
+ 第一：位置。该文件的位置是在res/xml/下的。
+ 第二：格式，PreferenceScreen为根标签，ListPreference为子标签。PreferenceScreen可以看作是一个大的框架
+ 第三：标签属性含义
+ android:key 唯一标识符，和android:id相类似，PreferenceManager可以以其为参数通过findPreference获取指定的preference
+ 注意，这个android:key的值也是Preference文件里面的XML“键”名
+ android:title 大标题
+ android:summary 标题下面的小字（这个要作为选项卡才有）
+ android:entries 弹出的对话框中，列表显示的文本内容，注意哦，这里指定的是一个数组哦
+ android:entryValues 与android:entries相对应的值
+ android:defaultValue 当对应值不存在时的默认值
+ android:dialogTitle 弹出的对话框中的标题信息
+ 更多的标签设置等你来发掘
+ -->
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:key="setting_list"
+    android:title="设置">
+
+    <!--编辑设置组-->
+    <PreferenceCategory
+        android:key="edit"
+        android:title="@string/edit" >
+
+        <CheckBoxPreference
+            android:key="fullscreen"
+            android:title="@string/markdown_fullscreen"
+            android:summaryOff="@string/markdown_fullscreen_off"
+            android:summaryOn="@string/markdown_fullscreen_on"
+            android:defaultValue="false" >
+        </CheckBoxPreference>
+
+        <CheckBoxPreference
+            android:key="imageBorder"
+            android:title="@string/show_image_border"
+            android:summaryOff="@string/show_image_border_off"
+            android:summaryOn="@string/show_image_border_on"
+            android:defaultValue="false" >
+        </CheckBoxPreference>
+
+        <EditTextPreference
+            android:key="stackDepth"
+            android:dialogTitle="@string/undo_history_num_input"
+            android:inputType="number"
+            android:maxLength="2"
+            android:title="@string/undo_history_num"
+            android:summary="@string/undo_history_num_summary"
+            android:positiveButtonText="@string/confirm"
+            android:negativeButtonText="@string/cancel"
+            android:defaultValue="20" />
+
+    </PreferenceCategory>
+
+    <!--界面设置组-->
+    <PreferenceCategory
+        android:key="interface"
+        android:title="@string/ui" >
+
+        <CheckBoxPreference
+            android:key="darkTheme"
+            android:title="@string/dark_theme"
+            android:summaryOff="@string/dark_theme_off"
+            android:summaryOn="@string/dark_theme_on"
+            android:defaultValue="false" >
+        </CheckBoxPreference>
+
+    </PreferenceCategory>
+
+    <!--其他设置组-->
+    <PreferenceCategory
+        android:key="others"
+        android:title="@string/others" >
+
+        <Preference
+            android:key="importDatabase"
+            android:title="@string/import_database"
+            android:summary="@string/import_database" >
+        </Preference>
+
+        <Preference
+            android:key="exportDatabase"
+            android:title="@string/export_database"
+            android:summary="@string/export_database_summary" >
+        </Preference>
+
+        <Preference
+            android:key="license"
+            android:title="@string/license"
+            android:summary="@string/license_type" >
+        </Preference>
+
+        <Preference
+            android:key="about"
+            android:title="@string/about" >
+        </Preference>
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

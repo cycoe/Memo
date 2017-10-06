@@ -19,15 +19,15 @@ public final class R {
         public static final int stackFromEnd = 0x7f01011c;
     }
     public static final class dimen {
-        public static final int fastscroll_default_thickness = 0x7f0a007b;
-        public static final int fastscroll_margin = 0x7f0a007c;
-        public static final int fastscroll_minimum_range = 0x7f0a007d;
-        public static final int item_touch_helper_max_drag_scroll_per_frame = 0x7f0a0087;
-        public static final int item_touch_helper_swipe_escape_max_velocity = 0x7f0a0088;
-        public static final int item_touch_helper_swipe_escape_velocity = 0x7f0a0089;
+        public static final int fastscroll_default_thickness = 0x7f0b007b;
+        public static final int fastscroll_margin = 0x7f0b007c;
+        public static final int fastscroll_minimum_range = 0x7f0b007d;
+        public static final int item_touch_helper_max_drag_scroll_per_frame = 0x7f0b0087;
+        public static final int item_touch_helper_swipe_escape_max_velocity = 0x7f0b0088;
+        public static final int item_touch_helper_swipe_escape_velocity = 0x7f0b0089;
     }
     public static final class id {
-        public static final int item_touch_helper_previous_elevation = 0x7f0f0005;
+        public static final int item_touch_helper_previous_elevation = 0x7f100005;
     }
     public static final class styleable {
         public static final int[] RecyclerView = { 0x010100c4, 0x010100f1, 0x7f010119, 0x7f01011a, 0x7f01011b, 0x7f01011c, 0x7f01011d, 0x7f01011e, 0x7f01011f, 0x7f010120, 0x7f010121 };

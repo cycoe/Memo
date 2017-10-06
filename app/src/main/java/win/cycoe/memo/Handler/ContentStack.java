@@ -44,11 +44,11 @@ public class ContentStack {
     }
 
     public boolean canUndo() {
-        return currentPoint + 1 < stackDepth;
+        return currentPoint < stackDepth - 1;
     }
 
     public boolean canRedo() {
-        return currentPoint - 1 >= 0;
+        return currentPoint > 0;
     }
 
     public Map<String, Object> undo() {

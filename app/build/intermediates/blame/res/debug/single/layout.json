@@ -24,12 +24,12 @@
         "source": "/home/cycoe/.android/build-cache/a22c32e9791e9c0d61f5b3a2b20deb84fd7adfd4/output/res/layout/design_bottom_navigation_item.xml"
     },
     {
-        "merged": "/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/res/merged/debug/layout/design_layout_snackbar_include.xml",
-        "source": "/home/cycoe/.android/build-cache/a22c32e9791e9c0d61f5b3a2b20deb84fd7adfd4/output/res/layout/design_layout_snackbar_include.xml"
-    },
-    {
         "merged": "/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/res/merged/debug/layout/design_navigation_menu.xml",
         "source": "/home/cycoe/.android/build-cache/a22c32e9791e9c0d61f5b3a2b20deb84fd7adfd4/output/res/layout/design_navigation_menu.xml"
+    },
+    {
+        "merged": "/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/res/merged/debug/layout/design_layout_snackbar_include.xml",
+        "source": "/home/cycoe/.android/build-cache/a22c32e9791e9c0d61f5b3a2b20deb84fd7adfd4/output/res/layout/design_layout_snackbar_include.xml"
     },
     {
         "merged": "/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/res/merged/debug/layout/design_layout_tab_text.xml",
@@ -102,10 +102,6 @@
     {
         "merged": "/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/res/merged/debug/layout/notification_template_lines_media.xml",
         "source": "/home/cycoe/.android/build-cache/840d6a41ec5f82de4fb4714735f04806d4f773cb/output/res/layout/notification_template_lines_media.xml"
-    },
-    {
-        "merged": "/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/res/merged/debug/layout/setting_item.xml",
-        "source": "/home/cycoe/AndroidStudioProjects/Memo/app/src/main/res/layout/setting_item.xml"
     },
     {
         "merged": "/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/res/merged/debug/layout/abc_activity_chooser_view_list_item.xml",
@@ -214,10 +210,6 @@
     {
         "merged": "/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/res/merged/debug/layout/design_navigation_menu_item.xml",
         "source": "/home/cycoe/.android/build-cache/a22c32e9791e9c0d61f5b3a2b20deb84fd7adfd4/output/res/layout/design_navigation_menu_item.xml"
-    },
-    {
-        "merged": "/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/res/merged/debug/layout/setting_group.xml",
-        "source": "/home/cycoe/AndroidStudioProjects/Memo/app/src/main/res/layout/setting_group.xml"
     },
     {
         "merged": "/home/cycoe/AndroidStudioProjects/Memo/app/build/intermediates/res/merged/debug/layout/abc_action_mode_bar.xml",

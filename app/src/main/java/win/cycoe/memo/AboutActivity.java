@@ -1,7 +1,5 @@
 package win.cycoe.memo;
 
-import android.app.Activity;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.method.LinkMovementMethod;
 import android.view.View;
@@ -13,37 +11,24 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import win.cycoe.memo.Handler.ConfigHandler;
-
 /**
  * Created by cycoe on 17-8-16.
  */
 
-public class AboutActivity extends Activity {
+public class AboutActivity extends MyActivity {
 
     private Toolbar aboutToolbar;
     private TextView aboutView;
 
-    private ConfigHandler configHandler;
-
     private String about;
-    private int colorTheme;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        loadConfig();
-        setTheme(colorTheme);
         setContentView(R.layout.activity_about);
 
         setToolbar();
         initView();
-    }
-
-    private void loadConfig() {
-        SharedPreferences pref = getSharedPreferences("config", MODE_PRIVATE);
-        configHandler = new ConfigHandler(pref);
-        colorTheme = configHandler.getValue("darkTheme") == 1 ? R.style.AppTheme_dark : R.style.AppTheme;
     }
 
     private void setToolbar() {
@@ -57,7 +42,7 @@ public class AboutActivity extends Activity {
     }
 
     private void initView() {
-        aboutView = findViewById(R.id.aboutView);
+        aboutView = (TextView) findViewById(R.id.aboutView);
         aboutView.setMovementMethod(LinkMovementMethod.getInstance());
         InputStream is = getResources().openRawResource(R.raw.about);
         InputStreamReader isr = new InputStreamReader(is);
